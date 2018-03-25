@@ -248,8 +248,9 @@ public class SqliteSqlHelper<T extends SqliteBaseEntity> {
     delete from t_test_table where id = 1;
 ```
 这里多了个建表SQL，这里是为了实现自动化部署数据库用的，相当于程序驱动数据，让更多主动层面转移到程序代码这一层。当我们为我们的业务新增一个数据实体时候，程序就能自动的去生成规范的数据库，免去了繁琐的手动创建以及容易弄错的字段类型方面的细节，如果封装的好的话，迭代更新就能免去SQL脚本了。扩展一下的话，在表名注解里面添加数据库的链接属性还可以实现平滑分库的功能（这个可以，对于sqlite这种小型数据库，如果能实现分库的话，那就不再是小型数据库了，当然本文的例子还是以单数据库为例）。
-        
-        而且建表的sql生成比较简单，只要单独的根据实体类的信息就能直接生成，如下：
+
+而且建表的sql生成比较简单，只要单独的根据实体类的信息就能直接生成，如下：
+
 ```java
 # SqliteSqlHelper.java
 public class SqliteSqlHelper<T extends SqliteBaseEntity> {

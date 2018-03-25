@@ -11,7 +11,7 @@ redirect_from:
 ## 计划封装
 <pre>
 database-oop
- │
+ |
  +──arangodb-oop
  +──db2-oop
  +──<span style="color:red;">elasticsearch</span>-oop
@@ -24,18 +24,20 @@ database-oop
  +──sqlserver-oop
  +──xml-oop
  ├─access-oop
- │  ├─src
- │  │  ├─main
- │  │  │  ├─java
- │  │  │  └─resources
- │  │  └─test
- │  │  ├─java
- │  │  └─resources
- │  └─pom.xml
+ │  ├─src
+ │  │  ├─main
+ │  │  │  ├─java
+ │  │  │  └─resources
+ │  │  └─test
+ │  │      ├─java
+ │  │      └─resources
+ │  └─pom.xml
  ├─.gitignore
  ├─database-oop.iml
  ├─pom.xml
  └─README.md
+ 
+ 注：<span style="color:green;">绿色</span>代表以及完成初步[-ed-ing]；<span style="color:red;">红色</span>代表进行中[-ing]。
 </pre>
 ## 封装要求
 

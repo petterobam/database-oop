@@ -53,7 +53,7 @@ public class TestTable extends SqliteBaseEntity {
      * 注：这里不使用SqliteColumn主键，默认的列名为publishtime
      */
     @SqliteTransient
-    @SqliteColumn(name = "publish_time")
+    @SqliteColumn(name = "create_time")
     private String publishTime;
 
     //get、set此处省略

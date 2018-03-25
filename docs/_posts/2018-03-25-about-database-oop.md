@@ -8,6 +8,35 @@ redirect_from:
   - /2018/03/25/
 ---
 
+## 计划封装
+<pre>
+database-oop
+ │
+ +──arangodb-oop
+ +──db2-oop
+ +──<span style="color:red;">elasticsearch</span>-oop
+ +──mongodb-oop
+ +──mysql-oop
+ +──<span style="color:red;">oracel</span>-oop
+ +──postgresql-oop
+ +──redis-oop
+ +──<span style="color:green;">sqlite</span>-oop
+ +──sqlserver-oop
+ +──xml-oop
+ ├─access-oop
+ │  ├─src
+ │  │  ├─main
+ │  │  │  ├─java
+ │  │  │  └─resources
+ │  │  └─test
+ │  │  ├─java
+ │  │  └─resources
+ │  └─pom.xml
+ ├─.gitignore
+ ├─database-oop.iml
+ ├─pom.xml
+ └─README.md
+</pre>
 ## 封装要求
 
 1. 面向对象封装

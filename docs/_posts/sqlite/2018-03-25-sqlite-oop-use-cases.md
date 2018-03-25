@@ -136,12 +136,12 @@ public void test2() {
     entity.setName("test1");
     entity.setAuthor("petter");
     entity.setArticle("article1");
-    entity.setCreateTime(MyDate.getStringDate());
+    entity.setCreateTime(SqliteUtils.getStringDate());
     sqliteService.insert(entity);
     entity.setName("title2");
     entity.setAuthor("bob");
     entity.setArticle("article2");
-    entity.setCreateTime(MyDate.getStringDate());
+    entity.setCreateTime(SqliteUtils.getStringDate());
     sqliteService.insert(entity);
 
     TestTable queryEntity = new TestTable();

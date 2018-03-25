@@ -1,0 +1,69 @@
+# Site Settings
+encoding: UTF-8
+exclude: ["*.gem", "*.gemspec", "Gemfile", "Gemfile.lock", "node_modules", "Rakefile", "starter-kit", "vendor"]
+lang: zh # Language code as defined in _data/i18n.yml. en, en-gb, en-us, zh, zh-cn, zh-tw etc.
+permalink: /blog/:year/:month/:day/:title/
+theme: jekyll-theme-simple-texture
+
+whitelist: [jekyll-feed, jekyll-redirect-from, jekyll-seo-tag, jekyll-sitemap]
+plugins:
+  - jekyll-feed
+  - jekyll-redirect-from
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+markdown: kramdown
+kramdown:
+  auto_id_prefix: 'heading-'
+  smart_quotes: ["apos", "apos", "quot", "quot"]
+  toc_levels: 1..3
+
+sass:
+  style: compressed
+
+# Site Data
+url: # the base hostname & protocol for your site, e.g. http://example.com
+baseurl: # the subpath of your site, e.g. /blog
+title: Database-OOP
+description: "GitHub博客."
+keywords: 'java,数据存储系统,面向对象封装'
+author:
+  name: "petterobam&oysb"
+  job_title:
+  location:
+  email: 1460300366@qq.com
+  social_links:
+    - name: facebook
+      url:
+    - name: github
+      url: https://github.com/petterobam/database-oop
+    - name: instagram
+      url:
+    - name: linkedin
+      url:
+    - name: stackoverflow
+      url:
+    - name: twitter
+      url: 
+    - name: vk
+      url:
+home:
+  section1: <h1>Database-OOP</h1>
+  section2: <h2>结构化数据存储系统的面向对象封装，你想要的数据库都在这！！</h2>
+  section3: <div class="social-links"><a class="ico-github btn" href="https://github.com/petterobam/database-oop" title="查看 GitHub"></a></div>
+blog:
+  cc_license: http://creativecommons.org/licenses/by-sa/4.0/ # CC License.
+  cc_license_image: /assets/images/theme/cc-by-sa.png # CC License.
+  footer_content: github <a href="http://jekyllrb.com/">Jekyll</a> theme.
+
+disqus:
+  shortname: # e.g. petterobam
+  public_key: # e.g. ULZ0b9TFefCUJHKQd4JCKv2v3u27YoG7YG8zXPewkWrT333Z0Se9YnxLzoV6VM8W
+google_analytics: # e.g. 'UA-42456515-5'
+addthis_public_id: # AddThis sharing plugin. See http://www.addthis.com/. E.g. ra-53329e27694534j5 
+
+paths:
+  home: /
+  blog: /blog/
+  categories: /blog/categories/
+  tags: /blog/tags/

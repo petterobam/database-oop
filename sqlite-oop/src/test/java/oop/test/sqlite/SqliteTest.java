@@ -1,9 +1,9 @@
 package oop.test.sqlite;
 
-import oop.sqlite.entity.TestSpliteSqlite;
-import oop.sqlite.entity.TestTable;
-import oop.sqlite.service.TestSpliteSqliteService;
-import oop.sqlite.service.TestTableService;
+import oop.test.sqlite.entity.TestSpliteSqlite;
+import oop.test.sqlite.entity.TestTable;
+import oop.test.sqlite.service.TestSpliteSqliteService;
+import oop.test.sqlite.service.TestTableService;
 import oop.sqlite.utils.SqliteHelper;
 import oop.sqlite.utils.SqliteUtils;
 import org.junit.Test;

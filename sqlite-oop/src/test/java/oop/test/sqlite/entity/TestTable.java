@@ -1,11 +1,10 @@
-package oop.sqlite.entity;
+package oop.test.sqlite.entity;
 
 import oop.sqlite.annotation.SqliteColumn;
 import oop.sqlite.annotation.SqliteID;
 import oop.sqlite.annotation.SqliteTable;
 import oop.sqlite.annotation.SqliteTransient;
 import oop.sqlite.base.SqliteBaseEntity;
-import oop.sqlite.config.SqliteConfig;
 
 /**
  * 测试表对应实体类
@@ -13,8 +12,8 @@ import oop.sqlite.config.SqliteConfig;
  * @author 欧阳洁
  * @create 2017-09-30 9:44
  **/
-@SqliteTable(name = "t_test_splite_sqlite",dbPath = "database/t_test_splite_",dbType = SqliteConfig.DB_TYPE_BY_DAY)
-public class TestSpliteSqlite extends SqliteBaseEntity {
+@SqliteTable(name = "t_test_table")
+public class TestTable extends SqliteBaseEntity {
     /**
      * 主键
      */

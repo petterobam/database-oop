@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>database-oop</groupId>
+    <artifactId>database-oop</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>oracel-oop</module>
+        <module>mysql-oop</module>
+        <module>elasticsearch-oop</module>
+        <module>access-oop</module>
+        <module>db2-oop</module>
+        <module>mongodb-oop</module>
+        <module>sqlserver-oop</module>
+        <module>redis-oop</module>
+        <module>xml-oop</module>
+        <module>arangodb-oop</module>
+        <module>sqlite-oop</module>
+        <module>postgresql-oop</module>
+    </modules>
+
+
+</project>

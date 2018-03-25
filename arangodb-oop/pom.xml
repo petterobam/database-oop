@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>database-oop</artifactId>
+        <groupId>database-oop</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>arangodb-oop</artifactId>
+
+    <properties>
+        <junit.version>4.11</junit.version>
+
+        <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <surefire-plugin.version>2.19.1</surefire-plugin.version>
+    </properties>
+
+    <dependencies>
+        <!--单元测试-->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <!--打包发布的nexus仓库地址-->
+    <distributionManagement>
+        <snapshotRepository>
+            <id>my-nexus-snapshots</id>
+            <name>User Porject Snapshot</name>
+            <url>http://localhost:8081/nexus/content/repositories/my-nexus-snapshots</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+        <repository>
+            <id>my-nexus-releases</id>
+            <name>User Porject Release</name>
+            <url>http://localhost:8081/nexus/content/repositories/my-nexus-releases</url>
+        </repository>
+    </distributionManagement>
+    <!--设置项目编译级别等设置 start-->
+    <build>
+        <!-- 打包的时候将资源文件打进来，不写这个是不行的 -->
+        <resources>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.properties</include>
+                    <include>**/*.xml</include>
+                </includes>
+            </resource>
+            <resource>
+                <!-- this is relative to the pom.xml directory -->
+                <directory>src/main/resources</directory>
+                <!-- the list has a default value of ** -->
+                <includes>
+                    <include>**/*.*</include>
+                </includes>
+            </resource>
+        </resources>
+        <plugins>
+            <!--surefire-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${surefire-plugin.version}</version>
+                <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
+            <!--source-->
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <configuration>
+                    <attach>true</attach>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <!--设置项目编译级别等设置 end-->
+</project>

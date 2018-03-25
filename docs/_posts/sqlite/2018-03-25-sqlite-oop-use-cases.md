@@ -128,7 +128,7 @@ public class TestTableService extends SqliteBaseService<TestTable, TestTableDao>
 ## 单元测试结果
 ```java
 //默认的方法测试，包括初始化检查表是否存在并构建、对象插入、对象查询（主键穿透查询）
-————————————————————————————————————————<SqliteTest.java>—————————————————————————————————————
+/*————————————————————————————————————————<SqliteTest.java>—————————————————————————————————————*/
 @Test
 public void test2() {
     TestTableService sqliteService = new TestTableService();//没有使用spring注入，暂时自己构建
@@ -156,26 +156,26 @@ public void test2() {
 ```
 
 test2()测试结果：
-> 执行非查询语句==> create table if not exists t_test_table(id integer  primary key autoincrement not null,name char(100)  not null,author char(20)  not null,article text ,<font color='red'>create_time</font> char(20)  not null)
-执行非查询语句影响行数==> 0
-执行非查询语句==> INSERT INTO t_test_table(name,author,article,create_time)values(?,?,?,?)
-执行非查询语句影响行数==> 1
-执行非查询语句==> INSERT INTO t_test_table(name,author,article,create_time)values(?,?,?,?)
-执行非查询语句影响行数==> 1
-执行查询语句==> SELECT * FROM t_test_table WHERE 1=1 
-执行查询语句结果==> [{"id":1,"name":"test1","author":"petter","article":"article1","<font color='red'>createTime</font>":"2018-02-20 22:54:32"},{"id":2,"name":"title2","author":"bob","article":"article2","<font color='red'>createTime</font>":"2018-02-20 22:54:32"}]
-执行查询语句==> SELECT * FROM t_test_table WHERE 1=1  and author=?
-执行查询语句结果==> [{"id":1,"name":"test1","author":"petter","article":"article1","<font color='red'>createTime</font>":"2018-02-20 22:54:32"}]
-执行查询语句==> SELECT * FROM t_test_table WHERE 1=1  and name=? and author=?
-执行查询语句结果==> []
-执行查询语句==> SELECT * FROM t_test_table WHERE 1=1  and id=?
-执行查询语句结果==> [{"id":1,"name":"test1","author":"petter","article":"article1","<font color='red'>createTime</font>":"2018-02-20 22:54:32"}]
+> 执行非查询语句==> create table if not exists t_test_table(id integer  primary key autoincrement not null,name char(100)  not null,author char(20)  not null,article text ,<font color='red'>create_time</font> char(20)  not null)<br/>
+执行非查询语句影响行数==> 0<br/>
+执行非查询语句==> INSERT INTO t_test_table(name,author,article,create_time)values(?,?,?,?)<br/>
+执行非查询语句影响行数==> 1<br/>
+执行非查询语句==> INSERT INTO t_test_table(name,author,article,create_time)values(?,?,?,?)<br/>
+执行非查询语句影响行数==> 1<br/>
+执行查询语句==> SELECT * FROM t_test_table WHERE 1=1<br/> 
+执行查询语句结果==> [{"id":1,"name":"test1","author":"petter","article":"article1","<font color='red'>createTime</font>":"2018-02-20 22:54:32"},{"id":2,"name":"title2","author":"bob","article":"article2","<font color='red'>createTime</font>":"2018-02-20 22:54:32"}]<br/>
+执行查询语句==> SELECT * FROM t_test_table WHERE 1=1  and author=?<br/>
+执行查询语句结果==> [{"id":1,"name":"test1","author":"petter","article":"article1","<font color='red'>createTime</font>":"2018-02-20 22:54:32"}]<br/>
+执行查询语句==> SELECT * FROM t_test_table WHERE 1=1  and name=? and author=?<br/>
+执行查询语句结果==> []<br/>
+执行查询语句==> SELECT * FROM t_test_table WHERE 1=1  and id=?<br/>
+执行查询语句结果==> [{"id":1,"name":"test1","author":"petter","article":"article1","<font color='red'>createTime</font>":"2018-02-20 22:54:32"}]<br/>
 
 ------------------------------------------------------------------------------------------------
 
 ```java
 //自定义的SQL查询测试，包含自定义SQL、结果集中额外列对应填充和查询对象属性值定位获取
-——————————————————————————————————————<SqliteTest.java>——————————————————————————————————————
+/*——————————————————————————————————————<SqliteTest.java>——————————————————————————————————————*/
 @Test
 public void test3() {
     TestTableService sqliteService = new TestTableService();//没有使用spring注入，暂时自己构建
@@ -184,16 +184,16 @@ public void test3() {
 ```
 
 test3()测试结果：
-> 执行非查询语句==> create table if not exists t_test_table(id integer  primary key autoincrement not null,name char(100)  not null,author char(20)  not null,article text ,create_time char(20)  not null)
-执行非查询语句影响行数==> 0
-执行查询语句==> select t.create_time publish_time,t.* from t_test_table t where name like '%'||?||'%'
+> 执行非查询语句==> create table if not exists t_test_table(id integer  primary key autoincrement not null,name char(100)  not null,author char(20)  not null,article text ,create_time char(20)  not null)<br/>
+执行非查询语句影响行数==> 0<br/>
+执行查询语句==> select t.create_time publish_time,t.* from t_test_table t where name like '%'||?||'%'<br/>
 执行查询语句结果==> [{"<font color='red'>publishTime</font>":"2018-02-20 22:36:18","id":1,"name":"test1","author":"petter","article":"article1","createTime":"2018-02-20 22:36:18"}]
 
 ------------------------------------------------------------------------------------------------
 
 ```java
 //自定义的SQL查询测试，这里直接撇开了实体类，可以任意的传参了，甚至调用存储过程或函数只需要一行注解就够了
-———————————————————————————————————————<SqliteTest.java>—————————————————————————————————————
+/*———————————————————————————————————————<SqliteTest.java>—————————————————————————————————————*/
 @Test
 public void test4() {
     TestTableService sqliteService = new TestTableService();//没有使用spring注入，暂时自己构建
@@ -201,7 +201,7 @@ public void test4() {
 }
 ```
 
-> 执行非查询语句==> create table if not exists t_test_table(id integer  primary key autoincrement not null,name char(100)  not null,author char(20)  not null,article text ,create_time char(20)  not null)
-执行非查询语句影响行数==> 0
-执行查询语句==> select * from t_test_table where name like '%'||?||'%' or id=?
+> 执行非查询语句==> create table if not exists t_test_table(id integer  primary key autoincrement not null,name char(100)  not null,author char(20)  not null,article text ,create_time char(20)  not null) <br/>
+执行非查询语句影响行数==> 0<br/>
+执行查询语句==> select * from t_test_table where name like '%'||?||'%' or id=?<br/>
 执行查询语句结果==> [{"id":1,"name":"test1","author":"petter","article":"article1","createTime":"2018-02-20 22:36:18"},{"id":2,"name":"title2","author":"bob","article":"article2","createTime":"2018-02-20 22:36:19"}]

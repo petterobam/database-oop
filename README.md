@@ -1,7 +1,11 @@
+[![Build Status](https://travis-ci.org/petterobam/database-oop.svg?branch=master)](https://travis-ci.org/petterobam/database-oop)
+
 # 结构化数据存储系统的面向对象封装
 博客地址：[http://www.db2oop.cn](http://www.db2oop.cn)
 
-欢迎参与：1460300366@qq.com
+自动构建：[https://travis-ci.org/petterobam/database-oop](https://travis-ci.org/petterobam/database-oop)
+
+欢迎参与：请骚扰 1460300366@qq.com
 
 当前参与人：[petterobam](https://github.com/petterobam)、[oysb](https://github.com/oysb)
 

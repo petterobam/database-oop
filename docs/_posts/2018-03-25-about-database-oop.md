@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Database-OOP说明"
+title: "Database-OOP规范说明&注意事项"
 description: "结构化数据存储系统的面向对象封装"
 categories: [数据存储系统, 面向对象封装, Java]
 tags: [规范说明,注意事项]
@@ -8,9 +8,7 @@ redirect_from:
   - /2018/02/21/
 ---
 
-## 结构化数据存储系统的面向对象封装
-
-### 封装要求
+## 封装要求
 
 1. 面向对象封装
     - 通过对象可以抽象存储结构（最好包括SQL-Table、Redis-Key或NoSQL-Index等存储结构的自动生成）
@@ -40,3 +38,16 @@ redirect_from:
     - 所有的java类统一在 oop.存储系统名.** 包名下面，如 oop.sqlite.base
     - 包结构层次要清晰，一眼就能看出职能
     - 类名采用驼峰命名，java代码规范采用阿里的idea-check默认规范即可
+    
+## 文档提交
+
+1. 每封文档提交都是一个单独的MarkDown文件，粘贴到项目 ```docs/_posts/```下，每个存储系统建立自己的文件夹，如 sqlite数据库 相关文档则在 ```docs/_posts/sqlite``` 下面
+
+2. 文件夹的名字和文件的名字要用英文字符，包括字母、数字、- 和 _、不要使用MarkDown关键字符如 \# 等
+
+3. 每个MarkDown文件的开始，要包含如下格式，用于建立博客的文档的索引和标签，格式出错会影响文章的显示效果
+![database-oop-head](images/about-database-oop/database-oop-head.png)
+
+4. 每个MarkDown文件名以 yyyy-MM-dd-自定义英文标题.md 前面的日期用于索引，后面的英文标题用于uri链接定位，如 本文档链接为 ```http://www.db2oop.cn/blog/2018/03/25/about-database-oop```
+
+5. 每个MarkDown文件用到的图片资源在```docs/_images/```下，如用到图片，请放到 ```docs/_images/自定义英文标题/```文件夹下面，防止文档图片资源混乱

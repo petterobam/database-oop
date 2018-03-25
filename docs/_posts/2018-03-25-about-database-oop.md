@@ -11,7 +11,7 @@ redirect_from:
 ## 计划封装
 <pre>
 database-oop
- |
+ |
  +──arangodb-oop
  +──db2-oop
  +──<span style="color:red;">elasticsearch</span>-oop
@@ -29,7 +29,7 @@ database-oop
  │  │  │  ├─java
  │  │  │  └─resources
  │  │  └─test
- │  │      ├─java
+ │  │      ├─java
  │  │      └─resources
  │  └─pom.xml
  ├─.gitignore

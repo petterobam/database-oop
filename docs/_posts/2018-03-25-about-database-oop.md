@@ -30,13 +30,13 @@ redirect_from:
     - 不需要使用已有日志系统，减少原生代码依赖（可以自定义日志工具，便于其他框架使用时收集日志）
 
 4. 每个功能必须写测试，在打包成Jar的情况下也能跑通测试
-    - 所有测试java类统一在 ```oop.test.存储系统名.***``` 包名下，如 ```oop.test.sqlite``` 
     - Access、Sqlite、XML这类文档类数据库要考虑路径查找问题
     - 连接第三方存储系统这类，在测试resources中配置测试，要兼容打包成Jar的情况
     - 使用基本的JDBC，测试类不要加载任何其他环境
     
 5. 命名规范
     - 所有的java类统一在 ```oop.存储系统名.**``` 包名下面，如 ```oop.sqlite.base```
+    - 所有测试java类统一在 ```oop.test.存储系统名.**``` 包名下，如 ```oop.test.sqlite``` 
     - 包结构层次要清晰，一眼就能看出职能
     - 类名采用驼峰命名，java代码规范采用阿里的idea-check默认规范即可
     
@@ -47,7 +47,7 @@ redirect_from:
 2. 文件夹的名字和文件的名字要用英文字符，包括 ```字母、数字、- 和 _``` ，不要使用MarkDown关键字符如 ```#、@、[]``` 等
 
 3. 每个MarkDown文件的开始，要包含如下格式，用于建立博客的文档的索引和标签，格式出错会影响文章的显示效果
-![database-oop-head](/images/about-database-oop/database-oop-head.png)
+![database-oop-head](/images/about-database-oop/about-database-oop-head.png)
 
 4. 每个MarkDown文件名以 yyyy-MM-dd-自定义英文标题.md 前面的日期用于索引，后面的英文标题用于uri链接定位，如 上面地址栏本文档链接
 

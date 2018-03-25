@@ -46,7 +46,7 @@ redirect_from:
 2. 文件夹的名字和文件的名字要用英文字符，包括字母、数字、- 和 _、不要使用MarkDown关键字符如 \# 等
 
 3. 每个MarkDown文件的开始，要包含如下格式，用于建立博客的文档的索引和标签，格式出错会影响文章的显示效果
-![database-oop-head](images/about-database-oop/database-oop-head.png)
+![database-oop-head](/images/about-database-oop/database-oop-head.png)
 
 4. 每个MarkDown文件名以 yyyy-MM-dd-自定义英文标题.md 前面的日期用于索引，后面的英文标题用于uri链接定位，如 本文档链接为 ```http://www.db2oop.cn/blog/2018/03/25/about-database-oop```
 

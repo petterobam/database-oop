@@ -17,7 +17,7 @@ database-oop
  +──<span style="color:red;">elasticsearch</span>-oop
  +──mongodb-oop
  +──mysql-oop
- +──<span style="color:red;">oracel</span>-oop
+ +──<span style="color:red;">oracle</span>-oop
  +──postgresql-oop
  +──redis-oop
  +──<span style="color:green;">sqlite</span>-oop

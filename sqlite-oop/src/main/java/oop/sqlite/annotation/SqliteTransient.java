@@ -1,4 +1,4 @@
-package my.sqlite.annotation;
+package oop.sqlite.annotation;
 
 /**
  * 非表字段标识注解

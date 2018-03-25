@@ -1,7 +1,4 @@
-package my.sqlite.console;
-
-import my.sqlite.utils.SqliteHelper;
-import my.sqlite.utils.SqliteUtils;
+package oop.sqlite.console;
 
 public class SqliteConsoleBaseService {
     /**

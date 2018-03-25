@@ -1,4 +1,4 @@
-package my.sqlite.annotation;
+package oop.sqlite.annotation;
 
 /**
  * Sqlite的ID注解类

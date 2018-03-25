@@ -12,6 +12,10 @@
     <artifactId>sqlite-oop</artifactId>
 
     <properties>
+        <jackson-databind.version>2.4.2</jackson-databind.version>
+        <jackson-module-jaxb-annotations.version>2.6.5</jackson-module-jaxb-annotations.version>
+        <sqlite.version>3.15.1</sqlite.version>
+        <json-lib.version>2.4</json-lib.version>
         <junit.version>4.11</junit.version>
 
         <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
@@ -20,6 +24,31 @@
     </properties>
 
     <dependencies>
+        <!-- sqlite数据库操作 -->
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>${sqlite.version}</version>
+        </dependency>
+        <!--json-lib-->
+        <dependency>
+            <groupId>net.sf.json-lib</groupId>
+            <artifactId>json-lib</artifactId>
+            <version>${json-lib.version}</version>
+            <classifier>jdk15</classifier>
+        </dependency>
+        <!--JSON处理-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson-databind.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-jaxb-annotations</artifactId>
+            <version>${jackson-module-jaxb-annotations.version}</version>
+        </dependency>
+
         <!--单元测试-->
         <dependency>
             <groupId>junit</groupId>

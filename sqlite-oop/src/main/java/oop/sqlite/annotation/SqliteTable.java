@@ -1,4 +1,4 @@
-package my.sqlite.annotation;
+package oop.sqlite.annotation;
 
 
 /**
@@ -19,10 +19,10 @@ public @interface SqliteTable {
      * 数据库文件路径
      * @return
      */
-    String dbPath() default my.sqlite.config.SqliteConfig.DB_PATH;
+    String dbPath() default oop.sqlite.config.SqliteConfig.DB_PATH;
     /**
      * 数据库文件路径
      * @return
      */
-    int dbType() default my.sqlite.config.SqliteConfig.DB_TYPE_DEFAULT;
+    int dbType() default oop.sqlite.config.SqliteConfig.DB_TYPE_DEFAULT;
 }

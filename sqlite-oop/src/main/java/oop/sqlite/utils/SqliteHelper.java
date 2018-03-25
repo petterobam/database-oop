@@ -1,8 +1,8 @@
-package my.sqlite.utils;
+package oop.sqlite.utils;
 
-import my.sqlite.annotation.SqliteTable;
-import my.sqlite.config.SqliteConfig;
-import my.sqlite.console.SqliteConsoleBaseEntity;
+import oop.sqlite.annotation.SqliteTable;
+import oop.sqlite.config.SqliteConfig;
+import oop.sqlite.console.SqliteConsoleBaseEntity;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

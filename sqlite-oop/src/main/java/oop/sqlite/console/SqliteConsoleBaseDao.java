@@ -1,7 +1,7 @@
-package my.sqlite.console;
+package oop.sqlite.console;
 
-import my.sqlite.utils.SqliteHelper;
-import my.sqlite.utils.SqliteUtils;
+import oop.sqlite.utils.SqliteHelper;
+import oop.sqlite.utils.SqliteUtils;
 
 /**
  * 控制台返回的基本Dao

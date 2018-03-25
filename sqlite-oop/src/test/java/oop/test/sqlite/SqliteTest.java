@@ -1,4 +1,4 @@
-package test.oop.sqlite;
+package oop.test.sqlite;
 
 import oop.sqlite.entity.TestSpliteSqlite;
 import oop.sqlite.entity.TestTable;

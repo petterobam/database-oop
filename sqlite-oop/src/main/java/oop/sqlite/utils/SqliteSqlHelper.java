@@ -1,11 +1,11 @@
-package my.sqlite.utils;
+package oop.sqlite.utils;
 
-import my.sqlite.annotation.SqliteColumn;
-import my.sqlite.annotation.SqliteID;
-import my.sqlite.annotation.SqliteSql;
-import my.sqlite.annotation.SqliteTable;
-import my.sqlite.annotation.SqliteTransient;
-import my.sqlite.base.SqliteBaseEntity;
+import oop.sqlite.annotation.SqliteColumn;
+import oop.sqlite.annotation.SqliteID;
+import oop.sqlite.annotation.SqliteSql;
+import oop.sqlite.annotation.SqliteTable;
+import oop.sqlite.annotation.SqliteTransient;
+import oop.sqlite.base.SqliteBaseEntity;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

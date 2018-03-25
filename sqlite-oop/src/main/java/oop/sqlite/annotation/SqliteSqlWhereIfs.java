@@ -1,4 +1,4 @@
-package my.sqlite.annotation;
+package oop.sqlite.annotation;
 
 /**
  * 实现SqliteSqlWhereIf的重复注解

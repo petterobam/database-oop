@@ -1,4 +1,4 @@
-package my.sqlite.console;
+package oop.sqlite.console;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -66,11 +66,11 @@ public class SqliteConsoleBaseEntity {
         this.sqlException = sqlException;
     }
 
-    public java.lang.Exception getException() {
+    public Exception getException() {
         return exception;
     }
 
-    public void setException(java.lang.Exception exception) {
+    public void setException(Exception exception) {
         this.exception = exception;
     }
 

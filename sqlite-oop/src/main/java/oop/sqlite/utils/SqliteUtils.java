@@ -1,4 +1,4 @@
-package my.sqlite.utils;
+package oop.sqlite.utils;
 
 import com.fasterxml.jackson.databind.JavaType;
 import net.sf.json.JSONObject;

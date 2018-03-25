@@ -1,8 +1,8 @@
-package my.sqlite.service;
+package oop.sqlite.service;
 
-import my.sqlite.base.SqliteBaseService;
-import my.sqlite.dao.TestTableDao;
-import my.sqlite.entity.TestTable;
+import oop.sqlite.base.SqliteBaseService;
+import oop.sqlite.dao.TestTableDao;
+import oop.sqlite.entity.TestTable;
 
 import java.util.List;
 

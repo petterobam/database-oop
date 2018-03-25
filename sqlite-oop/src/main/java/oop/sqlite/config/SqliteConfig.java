@@ -1,4 +1,4 @@
-package my.sqlite.config;
+package oop.sqlite.config;
 
 /**
  * sqlite的一些静态配置

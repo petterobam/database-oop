@@ -1,8 +1,8 @@
-package my.sqlite.dao;
+package oop.sqlite.dao;
 
-import my.sqlite.base.SqliteBaseDao;
-import my.sqlite.annotation.SqliteSql;
-import my.sqlite.entity.TestSpliteSqlite;
+import oop.sqlite.annotation.SqliteSql;
+import oop.sqlite.base.SqliteBaseDao;
+import oop.sqlite.entity.TestSpliteSqlite;
 
 import java.util.List;
 

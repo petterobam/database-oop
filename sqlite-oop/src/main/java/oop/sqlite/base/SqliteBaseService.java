@@ -1,6 +1,6 @@
-package my.sqlite.base;
+package oop.sqlite.base;
 
-import my.sqlite.utils.SqliteUtils;
+import oop.sqlite.utils.SqliteUtils;
 
 import java.util.List;
 

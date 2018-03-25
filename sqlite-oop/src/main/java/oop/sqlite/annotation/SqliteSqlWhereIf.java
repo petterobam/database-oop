@@ -1,4 +1,4 @@
-package my.sqlite.annotation;
+package oop.sqlite.annotation;
 
 /**
  * 自定义注解辅助，条件判断注解，用于生成动态SQL

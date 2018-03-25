@@ -1,10 +1,10 @@
-package my.sqlite.entity;
+package oop.sqlite.entity;
 
-import my.sqlite.base.SqliteBaseEntity;
-import my.sqlite.annotation.SqliteColumn;
-import my.sqlite.annotation.SqliteID;
-import my.sqlite.annotation.SqliteTable;
-import my.sqlite.annotation.SqliteTransient;
+import oop.sqlite.annotation.SqliteColumn;
+import oop.sqlite.annotation.SqliteID;
+import oop.sqlite.annotation.SqliteTable;
+import oop.sqlite.annotation.SqliteTransient;
+import oop.sqlite.base.SqliteBaseEntity;
 
 /**
  * 测试表对应实体类

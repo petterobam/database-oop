@@ -1,8 +1,8 @@
-package my.sqlite.base;
+package oop.sqlite.base;
 
-import my.sqlite.utils.SqliteHelper;
-import my.sqlite.utils.SqliteSqlHelper;
-import my.sqlite.utils.SqliteUtils;
+import oop.sqlite.utils.SqliteHelper;
+import oop.sqlite.utils.SqliteSqlHelper;
+import oop.sqlite.utils.SqliteUtils;
 
 import java.util.ArrayList;
 import java.util.List;

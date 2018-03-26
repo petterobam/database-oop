@@ -3,3 +3,8 @@ jdk:
   - oraclejdk8
 after_success:
   - mvn clean cobertura:cobertura coveralls:cobertura
+notifications:
+  email:
+    - 304982814@qq.com
+    - 1321342541@qq.com
+    - 604110740@qq.com

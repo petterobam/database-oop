@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Sqlite数据库面向对象封装思路"
+author: "petterobam"
 description: "Sqlite数据库的面向对象封装"
 categories: [Sqlite, 面向对象封装, Java]
 tags: [Sqlite,实现思路]

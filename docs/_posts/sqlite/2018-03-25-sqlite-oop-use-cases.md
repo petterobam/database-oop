@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Sqlite-OOP子项目使用示例"
+author: "petterobam"
 description: "Sqlite数据库的面向对象封装"
 categories: [Sqlite, 面向对象封装, Java]
 tags: [Sqlite,使用示例]

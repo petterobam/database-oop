@@ -78,6 +78,7 @@ database-oop
 2. 文件夹的名字和文件的名字要用英文字符，包括 ```字母、数字、- 和 _``` ，不要使用MarkDown关键字符如 ```#、@、[]``` 等
 
 3. 每个MarkDown文件的开始，要包含如下格式，用于建立博客的文档的索引和标签，格式出错会影响文章的显示效果，（PS:默认author是所有项目博客参与人，可以添加 ```author: "petterobam"``` ，改变author）
+
 ![database-oop-head](/images/about-database-oop/about-database-oop-head.png)
 
 

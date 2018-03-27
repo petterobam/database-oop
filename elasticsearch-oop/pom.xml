@@ -13,6 +13,10 @@
 
     <properties>
         <junit.version>4.11</junit.version>
+        <elasticsearch.client.version>5.6.3</elasticsearch.client.version>
+        <jackson-databind.version>2.4.2</jackson-databind.version>
+        <jackson-module-jaxb-annotations.version>2.6.5</jackson-module-jaxb-annotations.version>
+        <json-lib.version>2.4</json-lib.version>
 
         <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -20,12 +24,39 @@
     </properties>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.elasticsearch.client/transport -->
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>transport</artifactId>
+            <version>${elasticsearch.client.version}</version>
+        </dependency>
+
+
         <!--单元测试-->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
+        </dependency>
+
+        <!--json-lib-->
+        <dependency>
+            <groupId>net.sf.json-lib</groupId>
+            <artifactId>json-lib</artifactId>
+            <version>${json-lib.version}</version>
+            <classifier>jdk15</classifier>
+        </dependency>
+        <!--JSON处理-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson-databind.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-jaxb-annotations</artifactId>
+            <version>${jackson-module-jaxb-annotations.version}</version>
         </dependency>
     </dependencies>
 

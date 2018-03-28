@@ -4,6 +4,7 @@ jdk:
 after_success:
   - mvn clean cobertura:cobertura coveralls:cobertura
 notifications:
+  slack: database-oop:hbNh2J8vl7Z84nkajuVfgwkJ
   email:
     - 304982814@qq.com
     - 1321342541@qq.com

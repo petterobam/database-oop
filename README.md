@@ -2,8 +2,6 @@
 [![Coverage Status](https://coveralls.io/repos/github/petterobam/database-oop/badge.svg?branch=master)](https://coveralls.io/github/petterobam/database-oop?branch=master)
 [![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=103)](https://opensource.org/licenses/mit-license.php)
 [![bitHound Overall Score](https://www.bithound.io/github/petterobam/database-oop/badges/score.svg)](https://www.bithound.io/github/petterobam/database-oop)
-[![bitHound Dependencies](https://www.bithound.io/github/petterobam/database-oop/badges/dependencies.svg)](https://www.bithound.io/github/petterobam/database-oop/master/dependencies/npm)
-[![bitHound Dev Dependencies](https://www.bithound.io/github/petterobam/database-oop/badges/devDependencies.svg)](https://www.bithound.io/github/petterobam/database-oop/master/dependencies/npm)
 [![bitHound Code](https://www.bithound.io/github/petterobam/database-oop/badges/code.svg)](https://www.bithound.io/github/petterobam/database-oop)
 [![Analytics](https://ga-beacon.appspot.com/UA-85522412-2/welcome-page)](https://github.com/igrigorik/ga-beacon)
 [![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges)

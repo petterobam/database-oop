@@ -1,5 +1,6 @@
 en: &en
   about: 'About'
+  topic: 'Home Topic'
   articles: 'Articles'
   back_to_top: 'Back to Top'
   categories: 'Categories'
@@ -39,6 +40,7 @@ en-nz:
   <<: *en
 zh: &zh
   about: '关于'
+  topic: '主题展示'
   articles: '文章列表'
   back_to_top: '返回顶部'
   categories: '文章分类'

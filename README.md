@@ -15,7 +15,7 @@
 
 欢迎参与：请骚扰 1460300366@qq.com
 
-当前参与人：[petterobam](https://github.com/petterobam)、[oysb](https://github.com/oysb)、[jadezhang123](https://github.com/jadezhang123)、[jefffcheng](https://github.com/jefffcheng)
+当前参与人：[petterobam](https://github.com/petterobam)、[oysb](https://github.com/oysb)、[jadezhang123](https://github.com/jadezhang123)、[jefffcheng](https://github.com/jefffcheng)、[kkkkkkkkim](http://www.github.com/kkkkkkkkim)
 
 ## 封装要求
 

@@ -31,9 +31,11 @@
                 <artifactId>cobertura-maven-plugin</artifactId>
                 <version>2.5.2</version>
                 <configuration>
+                    <encoding>UTF-8</encoding>
                     <format>xml</format>
                     <maxmem>256m</maxmem>
                     <aggregate>true</aggregate>
+                    <check/>
                 </configuration>
             </plugin>
             <plugin>

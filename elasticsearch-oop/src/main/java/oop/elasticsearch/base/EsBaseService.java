@@ -1,6 +1,6 @@
 package oop.elasticsearch.base;
 
-import oop.elasticsearch.utils.EsJsonMapper;
+import oop.elasticsearch.utils.EsJsonUtils;
 import oop.elasticsearch.utils.EsLogUtils;
 import oop.elasticsearch.utils.EsUtils;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
@@ -52,26 +52,23 @@ import java.util.Map;
  */
 public abstract class EsBaseService {
     /**
+     * 服务
+     */
+    private TransportClient client;
+    /**
      * 获取连接
+     *
      * @return
      */
     public TransportClient getClient() {
         return client;
     }
-
     /**
-     * 设置连接
+     * 设置连接，继承这个类必须要实现
+     *
      * @param client
      */
-    public void setClient(TransportClient client) {
-        this.client = client;
-    }
-
-    /**
-     * 服务
-     */
-    private TransportClient client;
-
+    public abstract void setClient(TransportClient client);
 
     /**
      * 获取索引管理
@@ -243,7 +240,7 @@ public abstract class EsBaseService {
             if (o instanceof String) {
                 json = (String) o;
             } else {
-                json = EsJsonMapper.nonEmptyMapper().toJson(o);
+                json = EsJsonUtils.toJSONString(o);
             }
             return indexRequest(index, type, id).setSource(json, XContentType.JSON);
         }
@@ -367,9 +364,9 @@ public abstract class EsBaseService {
         page.setTotal((int) hits.getTotalHits());
         //循环解析返回的数据
         List<E> list = new ArrayList<E>();
-        if(null != hits && hits.hits().length > 0){
+        if (null != hits && hits.getHits().length > 0) {
             for (SearchHit hit : hits) {
-                list.add(EsJsonMapper.nonEmptyMapper().fromJson(hit.getSourceAsString(), clazz));
+                list.add(EsJsonUtils.getObject(hit.getSourceAsString(), clazz));
             }
         }
         page.setRecords(list);
@@ -447,10 +444,10 @@ public abstract class EsBaseService {
                         .execute().actionGet();
             }
             SearchHits hits = scrollResponse.getHits();
-            sum += hits.hits().length;
-            if(null != hits && hits.hits().length > 0){
+            sum += hits.getHits().length;
+            if (null != hits && hits.getHits().length > 0) {
                 for (SearchHit hit : hits) {
-                    list.add(EsJsonMapper.nonEmptyMapper().fromJson(hit.getSourceAsString(), clazz));
+                    list.add(EsJsonUtils.getObject(hit.getSourceAsString(), clazz));
                 }
             }
         } while (sum < count);
@@ -489,7 +486,7 @@ public abstract class EsBaseService {
     public static final int MAX_RESULT_WINDOW = 50000000;
 
     /**
-     * 创建公共日志索引
+     * 创建索引
      *
      * @param index           索引 数据库
      * @param type            表

@@ -1,8 +1,8 @@
 package oop.sqlite.utils;
 
-import com.fasterxml.jackson.databind.JavaType;
-import net.sf.json.JSONObject;
-import net.sf.json.util.JSONTokener;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
@@ -11,12 +11,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Modifier;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-
-;
-;
 
 public class SqliteUtils {
     private static final String osName = System.getProperty("os.name").toLowerCase();
@@ -239,14 +237,24 @@ public class SqliteUtils {
     public static <T> T getInstance(String jsonString, Class clazz) {
         if (SqliteUtils.isBlank(jsonString)) return null;
         if ("[]".equals(SqliteUtils.trim(jsonString))) return null;
-        Object json = new JSONTokener(jsonString).nextValue();//字符串 转json 类型对象
-        if (json instanceof JSONObject) {  //这种   {"XXX": "101",{},[]} 对象
-            return (T) SqliteJsonMapper.nonDefaultMapper().fromJson(json.toString(), clazz);
-        } else {
+        Object obj = JSON.parse(jsonString);
+        if (obj == null) {
+            return null;
+        }
+        if (obj instanceof JSONArray) {
+            JSONArray jsonarr = (JSONArray) obj;
+            List list = new ArrayList();
             //如果集合不为null则是返回成功,则需要修改数据的时间
             //创建转换json的需要转换的集合类型   [{},{}]
-            JavaType javaType = SqliteJsonMapper.nonDefaultMapper().contructCollectionType(List.class, clazz);
-            return SqliteJsonMapper.nonDefaultMapper().fromJson(jsonString, javaType);//反序列化复杂List
+            for (int i = 0; i < jsonarr.size(); i++) {
+                list.add(jsonarr.getObject(i, clazz));
+            }
+            return (T)list;
+        }else if(obj instanceof JSONObject){
+            JSONObject jsonObject = (JSONObject) obj;
+            return (T)jsonObject.toJavaObject(clazz);
+        }else {
+            return null;
         }
     }
 
@@ -259,13 +267,12 @@ public class SqliteUtils {
      * @throws throws [违例类型] [违例说明]
      * @see [类、类#方法、类#成员]
      */
-    public static String getJsonObject(Object object) {
+    public static String getJson(Object object) {
         try {
-            String json = SqliteUtils.toString(JSONObject.fromObject(object));
-            return json;
+            return SqliteJsonUtils.toJSONString(object);
         } catch (Exception e) {
             e.printStackTrace();
-            return "{}";
+            return null;
         }
     }
 
@@ -275,21 +282,9 @@ public class SqliteUtils {
      * @param list
      * @return
      */
-    public static String getJsonList(List list) {
+    public static String getJson(List list) {
         if (list == null) return "[]";
-        StringBuffer jsonBuf = new StringBuffer("[");
-        boolean flag = false;
-        for (Object obj : list) {
-            if (flag) {
-                jsonBuf.append(",");
-            } else {
-                flag = true;
-            }
-            String jsonOne = getJsonObject(obj);
-            jsonBuf.append(jsonOne);
-        }
-        jsonBuf.append("]");
-        return jsonBuf.toString();
+        return SqliteJsonUtils.toJSONString(list);
     }
 
     /**

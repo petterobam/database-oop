@@ -688,7 +688,7 @@ public class SqliteHelper {
             }
             result.add(one);
         }
-        String dataStr = SqliteUtils.getJsonList(result);
+        String dataStr = SqliteUtils.getJson(result);
         System.out.println("执行查询语句结果==> " + dataStr);
         return dataStr;
     }
@@ -716,7 +716,7 @@ public class SqliteHelper {
             }
             result.add(one);
         }
-        String dataStr = SqliteUtils.getJsonList(result);
+        String dataStr = SqliteUtils.getJson(result);
         System.out.println("执行查询语句结果==> " + dataStr);
         return dataStr;
     }
@@ -805,7 +805,7 @@ public class SqliteHelper {
                 }
                 result.add(one);
             }
-            String dataRes = SqliteUtils.getJsonList(result);
+            String dataRes = SqliteUtils.getJson(result);
             System.out.println(dataRes);
 
             PreparedStatement prep = connection.prepareStatement(

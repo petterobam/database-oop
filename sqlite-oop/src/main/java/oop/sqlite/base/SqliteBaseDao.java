@@ -99,6 +99,10 @@ public abstract class SqliteBaseDao<T extends SqliteBaseEntity> {
      */
     public int insert(T entity) {
         this.sqlHelper.createInsert(entity);
+        if(!SqliteUtils.isBlank(entity.getNeedCreateBefSql())){
+            //插入数据之前判断是否需要建表
+            this.sqliteHelper.execute(entity.getNeedCreateBefSql());
+        }
         return this.sqliteHelper.insert(entity.getCurrentSql(), entity.getCurrentParam());
     }
 
@@ -125,16 +129,25 @@ public abstract class SqliteBaseDao<T extends SqliteBaseEntity> {
     }
 
     /**
+     * 删除，分表字段值
+     *
+     * @param id
+     * @return
+     */
+    public int deleteById(Object id,String tableExt) {
+        String sql = this.sqlHelper.createDeleteById(id,tableExt);
+        List<Object> param = new ArrayList<Object>(1);
+        param.add(id);
+        return this.sqliteHelper.delete(sql, param);
+    }
+    /**
      * 删除
      *
      * @param id
      * @return
      */
     public int deleteById(Object id) {
-        String sql = this.sqlHelper.createDeleteById(id);
-        List<Object> param = new ArrayList<Object>(1);
-        param.add(id);
-        return this.sqliteHelper.delete(sql, param);
+        return this.deleteById(id,null);
     }
 
     /**
@@ -162,13 +175,23 @@ public abstract class SqliteBaseDao<T extends SqliteBaseEntity> {
     }
 
     /**
-     * 非查询语句执行，返回T
+     * 查询语句执行，返回T
      *
      * @param id
      * @return
      */
     public T queryById(Object id) {
-        String sql = this.sqlHelper.createSelectById(id);
+        return this.queryById(id,null);
+    }
+
+    /**
+     * 查询语句执行，返回T
+     * @param id
+     * @param tableExt 分表字段的值
+     * @return
+     */
+    public T queryById(Object id,String tableExt) {
+        String sql = this.sqlHelper.createSelectById(id,tableExt);
         List<Object> param = new ArrayList<Object>(1);
         param.add(id);
         String jsonStr = this.sqliteHelper.queryJsonResult(sql, param, this.getColumMap());

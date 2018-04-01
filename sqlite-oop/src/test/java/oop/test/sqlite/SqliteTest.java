@@ -1,10 +1,8 @@
 package oop.test.sqlite;
 
-import oop.test.sqlite.entity.TestSpliteSqlite;
-import oop.test.sqlite.entity.TestTable;
-import oop.test.sqlite.service.TestSpliteSqliteService;
-import oop.test.sqlite.service.TestTableService;
 import oop.sqlite.utils.SqliteHelper;
+import oop.test.sqlite.entity.TestTable;
+import oop.test.sqlite.service.TestTableService;
 import oop.sqlite.utils.SqliteUtils;
 import org.junit.Test;
 
@@ -59,57 +57,6 @@ public class SqliteTest {
         List<TestTable> list = sqliteService.getByNameOrId("title", 1);
     }
 
-    @Test
-    public void test5() {
-        TestSpliteSqliteService sqliteService = new TestSpliteSqliteService();//没有使用spring注入，暂时自己构建
-        TestSpliteSqlite entity = new TestSpliteSqlite();
-        entity.setName("test1");
-        entity.setAuthor("petter");
-        entity.setArticle("article1");
-        entity.setCreateTime(SqliteUtils.getStringDate());
-        sqliteService.insert(entity);
-        entity.setName("title2");
-        entity.setAuthor("bob");
-        entity.setArticle("article2");
-        entity.setCreateTime(SqliteUtils.getStringDate());
-        sqliteService.insert(entity);
-
-        TestSpliteSqlite queryEntity = new TestSpliteSqlite();
-        sqliteService.query(queryEntity);
-        queryEntity.setAuthor("petter");
-        sqliteService.query(queryEntity);
-        queryEntity.setName("test");
-        sqliteService.query(queryEntity);
-        queryEntity.setId(1);
-        sqliteService.query(queryEntity);
-    }
-
-    @Test
-    public void test6() {
-        TestSpliteSqliteService sqliteService = new TestSpliteSqliteService();//没有使用spring注入，暂时自己构建
-        sqliteService.getByName("test");
-        sqliteService.getByNameOrId("title", 1);
-    }
-    @Test
-    public void test7(){
-        SqliteHelper sqliteHelper = new SqliteHelper("/D:/Sqlite/dbs/test.db",true);
-        sqliteHelper.queryJsonResult("select * from person");
-        sqliteHelper.cmdExec(".dd");
-        String result = sqliteHelper.cmdExec(".tables");
-        if(!SqliteUtils.isBlank(result)) {
-            result = result.replaceAll("\r", " ");
-            result = result.replaceAll("\n", " ");
-            while (result.indexOf("  ") > 0) {
-                result = result.replaceAll("  ", " ");
-            }
-            String[] arr = result.split(" ");
-            if(null != arr){
-                for (String s : arr) {
-                    System.out.println(s);
-                }
-            }
-        }
-    }
     @Test
     public void test8(){
         TestTableService sqliteService = new TestTableService();//没有使用spring注入，暂时自己构建

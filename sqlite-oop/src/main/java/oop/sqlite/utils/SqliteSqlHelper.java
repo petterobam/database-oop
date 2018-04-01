@@ -4,6 +4,7 @@ import oop.sqlite.annotation.SqliteColumn;
 import oop.sqlite.annotation.SqliteID;
 import oop.sqlite.annotation.SqliteSql;
 import oop.sqlite.annotation.SqliteTable;
+import oop.sqlite.annotation.SqliteTableSplit;
 import oop.sqlite.annotation.SqliteTransient;
 import oop.sqlite.base.SqliteBaseEntity;
 
@@ -28,6 +29,7 @@ public class SqliteSqlHelper<T extends SqliteBaseEntity> {
     private String idName;//主键名
     private Field idField;//主键变量属性
     List<Field> columnFields;//表列名对应的变量属性集合
+    Field tableSplitField;//分表变量属性
     Map<String, String> columnMap;//表列名和字段映射map
 
     /**
@@ -49,13 +51,27 @@ public class SqliteSqlHelper<T extends SqliteBaseEntity> {
      * @return
      */
     public String createTableSql() {
+        return this.createTableSql(null);
+    }
+
+    /**
+     * 创建创建表的sql语句
+     *
+     * @param tableName
+     * @return
+     */
+    public String createTableSql(String tableName) {
         StringBuffer sql = new StringBuffer("create table if not exists ");
-        sql.append(this.tableName).append("(");
+        if (SqliteUtils.isBlank(tableName)) {
+            sql.append(this.getTableName()).append("(");
+        } else {
+            sql.append(tableName).append("(");
+        }
         boolean useCumma = false;
         for (Field field : this.columnFields) {
             if (useCumma) {
                 sql.append(",");//第一次不用逗号
-            }else {
+            } else {
                 useCumma = true;
             }
             String columnName = field.getName();
@@ -87,7 +103,7 @@ public class SqliteSqlHelper<T extends SqliteBaseEntity> {
     public void createDelete(T target) {
         List<Object> param = new Vector<Object>();
         StringBuffer sqlBuffer = new StringBuffer();
-        sqlBuffer.append("DELETE FROM ").append(this.tableName);
+        sqlBuffer.append("DELETE FROM ").append(this.getTableName(target));
         finishWhereOfAnd(sqlBuffer, param, target);//完成where条件
 
         target.setCurrentSql(sqlBuffer.toString());
@@ -100,8 +116,16 @@ public class SqliteSqlHelper<T extends SqliteBaseEntity> {
      * @param id
      */
     public String createDeleteById(Object id) {
+        return createSelectById(id,null);
+    }
+    /**
+     * 根据Id删除Sql
+     *
+     * @param id
+     */
+    public String createDeleteById(Object id,String tableExt) {
         StringBuffer sqlBuffer = new StringBuffer();
-        sqlBuffer.append("DELETE FROM ").append(this.tableName).append(" WHERE ");
+        sqlBuffer.append("DELETE FROM ").append(this.getTableName(tableExt)).append(" WHERE ");
         sqlBuffer.append(this.idName).append("=?");
 
         return sqlBuffer.toString();
@@ -113,12 +137,12 @@ public class SqliteSqlHelper<T extends SqliteBaseEntity> {
     public void createUpdate(T target) {
         List<Object> param = new Vector<Object>();
         StringBuffer sqlBuffer = new StringBuffer();
-        sqlBuffer.append("UPDATE ").append(this.tableName).append(" SET ");
+        sqlBuffer.append("UPDATE ").append(this.getTableName(target)).append(" SET ");
         int count = 0;
         for (Field field : this.columnFields) {
             if (!Modifier.isStatic(field.getModifiers())) {
                 Object value = readField(field, target);
-                if(null == value){//为空不做更新考虑
+                if (null == value) {//为空不做更新考虑
                     continue;
                 }
                 SqliteID id = field.getAnnotation(SqliteID.class);
@@ -147,7 +171,7 @@ public class SqliteSqlHelper<T extends SqliteBaseEntity> {
     public void createInsert(T target) {
         List<Object> param = new Vector<Object>();
         StringBuffer sqlBuffer = new StringBuffer();
-        sqlBuffer.append("INSERT INTO ").append(this.tableName).append("(");
+        sqlBuffer.append("INSERT INTO ").append(this.getTableName(target)).append("(");
         for (Field field : this.columnFields) {
             if (!Modifier.isStatic(field.getModifiers())) {
                 SqliteID id = field.getAnnotation(SqliteID.class);
@@ -183,19 +207,21 @@ public class SqliteSqlHelper<T extends SqliteBaseEntity> {
     public void createSelect(T target) {
         List<Object> param = new Vector<Object>();
         StringBuffer sqlBuffer = new StringBuffer();
-        sqlBuffer.append("SELECT * FROM ").append(this.tableName);
+        sqlBuffer.append("SELECT * FROM ").append(this.getTableName(target));
         finishWhereOfAnd(sqlBuffer, param, target);
 
         target.setCurrentSql(sqlBuffer.toString());
         target.setCurrentParam(param);
     }
+
     /**
      * 创建查询语句
+     * @param target
      */
     public void createCount(T target) {
         List<Object> param = new Vector<Object>();
         StringBuffer sqlBuffer = new StringBuffer();
-        sqlBuffer.append("SELECT COUNT(1) FROM ").append(this.tableName);
+        sqlBuffer.append("SELECT COUNT(1) FROM ").append(this.getTableName(target));
         finishWhereOfAnd(sqlBuffer, param, target);
 
         target.setCurrentSql(sqlBuffer.toString());
@@ -204,10 +230,22 @@ public class SqliteSqlHelper<T extends SqliteBaseEntity> {
 
     /**
      * 创建查询语句
+     * @param id
+     * @return
      */
     public String createSelectById(Object id) {
+        return this.createSelectById(id,null);
+    }
+
+    /**
+     * 创建查询语句
+     * @param id
+     * @param tableExt
+     * @return
+     */
+    public String createSelectById(Object id,String tableExt) {
         StringBuffer sqlBuffer = new StringBuffer();
-        sqlBuffer.append("SELECT * FROM ").append(this.tableName).append(" WHERE ");
+        sqlBuffer.append("SELECT * FROM ").append(this.getTableName(tableExt)).append(" WHERE ");
         sqlBuffer.append(this.idName).append("=?");
 
         return sqlBuffer.toString();
@@ -215,6 +253,8 @@ public class SqliteSqlHelper<T extends SqliteBaseEntity> {
 
     /**
      * 创建自定义查询语句
+     * @param daoMethodInfo
+     * @param target
      */
     public void convertSelfSql(StackTraceElement daoMethodInfo, T target) {
         if (null == daoMethodInfo) {//为空用默认的查询语句
@@ -244,7 +284,7 @@ public class SqliteSqlHelper<T extends SqliteBaseEntity> {
                 }
 
             }
-            String sql = SqliteUtils.replace(sqliteSql.sql(), "this.tableName", this.tableName);
+            String sql = SqliteUtils.replace(sqliteSql.sql(), "this.tableName", this.getTableName());
             //TODO 此处可以读取自定义SQL的辅助注解，像上面提到的SqliteSqlWhereIf注解，实现动态SQL
             target.setCurrentSql(sql);
             target.setCurrentParam(param);
@@ -276,7 +316,7 @@ public class SqliteSqlHelper<T extends SqliteBaseEntity> {
             return null;
         }
         SqliteSql sqliteSql = method.getAnnotation(SqliteSql.class);
-        String sql = SqliteUtils.replace(sqliteSql.sql(), "this.tableName", this.tableName);
+        String sql = SqliteUtils.replace(sqliteSql.sql(), "this.tableName", this.getTableName());
         //TODO 此处可以读取自定义SQL的辅助注解，像上面提到的SqliteSqlWhereIf注解，实现动态SQL
         return sql;
     }
@@ -313,6 +353,10 @@ public class SqliteSqlHelper<T extends SqliteBaseEntity> {
         }
         for (Field field : fieldArray) {
             String columnName = field.getName();
+            if (this.tableSplitField == null && field.isAnnotationPresent(SqliteTableSplit.class)) {
+                //动态分表功能，记录分表字段
+                this.tableSplitField = field;
+            }
             if (field.isAnnotationPresent(SqliteTransient.class)) {
                 // 有SqliteTransient注解的属性不记录，但是值的映射填充可以添加
                 SqliteColumn column = field.getAnnotation(SqliteColumn.class);
@@ -345,6 +389,56 @@ public class SqliteSqlHelper<T extends SqliteBaseEntity> {
     public String getTableName() {
         if (SqliteUtils.isBlank(this.tableName)) {
             this.tableName = this.getTableNameForClass(this.targetClass);
+        }
+        return this.tableName;
+    }
+
+    /**
+     * 根据注解获取表名
+     *
+     * @param target
+     * @return
+     */
+    public String getTableName(T target) {
+        if (SqliteUtils.isBlank(this.tableName)) {
+            this.tableName = this.getTableNameForClass(this.targetClass);
+        }
+        //启用分表功能后，动态获取表名，并生成建表SQL
+        if (null != this.tableSplitField) {
+            String fieldValue = (String) this.readField(this.tableSplitField, target);
+            if (!SqliteUtils.isBlank(fieldValue)) {
+                String joinStr = "_";
+                SqliteTableSplit splitAnnotation = this.tableSplitField.getAnnotation(SqliteTableSplit.class);
+                if (null != splitAnnotation) {
+                    joinStr = splitAnnotation.joinStr();
+                }
+                String currentTableName = new StringBuffer(this.tableName).append(joinStr).append(fieldValue).toString();
+                String creatTableSql = this.createTableSql(currentTableName);
+                target.setNeedCreateBefSql(creatTableSql);
+                return currentTableName;
+            }
+        }
+        return this.tableName;
+    }
+
+    /**
+     * 根据注解获取表名
+     *
+     * @param tableExt
+     * @return
+     */
+    public String getTableName(String tableExt) {
+        if (SqliteUtils.isBlank(this.tableName)) {
+            this.tableName = this.getTableNameForClass(this.targetClass);
+        }
+        if (!SqliteUtils.isBlank(tableExt) && null != this.tableSplitField) {
+            String joinStr = "_";
+            SqliteTableSplit splitAnnotation = this.tableSplitField.getAnnotation(SqliteTableSplit.class);
+            if (null != splitAnnotation) {
+                joinStr = splitAnnotation.joinStr();
+            }
+            String currentTableName = new StringBuffer(this.tableName).append(joinStr).append(tableExt).toString();
+            return currentTableName;
         }
         return this.tableName;
     }

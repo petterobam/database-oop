@@ -64,6 +64,7 @@ public abstract class SqliteBaseService<T extends SqliteBaseEntity, D extends Sq
     public List<T> query(String sql) {
         return this.baseDao.query(sql);
     }
+
     /**
      * 查询条数语句执行，返回条数
      *
@@ -116,6 +117,17 @@ public abstract class SqliteBaseService<T extends SqliteBaseEntity, D extends Sq
     }
 
     /**
+     * 删除
+     *
+     * @param id
+     * @param tableExt 分表字段值
+     * @return
+     */
+    public int deleteById(Object id, String tableExt) {
+        return this.baseDao.deleteById(id, tableExt);
+    }
+
+    /**
      * 查询语句执行，返回List<T>
      *
      * @param entity
@@ -124,6 +136,7 @@ public abstract class SqliteBaseService<T extends SqliteBaseEntity, D extends Sq
     public List<T> query(T entity) {
         return this.baseDao.query(entity);
     }
+
     /**
      * 查询条数语句执行，返回条数
      *
@@ -142,5 +155,16 @@ public abstract class SqliteBaseService<T extends SqliteBaseEntity, D extends Sq
      */
     public T queryById(Object id) {
         return this.baseDao.queryById(id);
+    }
+
+    /**
+     * 查询语句执行，返回List<T>
+     *
+     * @param id
+     * @param tableExt 分表字段的值
+     * @return
+     */
+    public T queryById(Object id, String tableExt) {
+        return this.baseDao.queryById(id, tableExt);
     }
 }

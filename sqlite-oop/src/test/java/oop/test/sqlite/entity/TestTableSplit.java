@@ -1,11 +1,12 @@
 package oop.test.sqlite.entity;
 
+
 import oop.sqlite.annotation.SqliteColumn;
 import oop.sqlite.annotation.SqliteID;
 import oop.sqlite.annotation.SqliteTable;
+import oop.sqlite.annotation.SqliteTableSplit;
 import oop.sqlite.annotation.SqliteTransient;
 import oop.sqlite.base.SqliteBaseEntity;
-import oop.sqlite.config.SqliteConfig;
 
 /**
  * 测试表对应实体类
@@ -13,13 +14,19 @@ import oop.sqlite.config.SqliteConfig;
  * @author 欧阳洁
  * @create 2017-09-30 9:44
  **/
-@SqliteTable(name = "t_test_splite_sqlite",dbPath = "database/t_test_splite_",dbType = SqliteConfig.DB_TYPE_BY_DAY)
-public class TestSpliteSqlite extends SqliteBaseEntity {
+@SqliteTable(name = "t_test_split_table")
+public class TestTableSplit extends SqliteBaseEntity {
     /**
      * 主键
      */
     @SqliteID
     private Integer id;
+    /**
+     * 类型，分表字段
+     */
+    @SqliteColumn(notNull = true)
+    @SqliteTableSplit
+    private String type;
     /**
      * 名称
      */
@@ -59,6 +66,14 @@ public class TestSpliteSqlite extends SqliteBaseEntity {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getName() {

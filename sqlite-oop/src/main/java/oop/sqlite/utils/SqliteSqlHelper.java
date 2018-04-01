@@ -171,7 +171,7 @@ public class SqliteSqlHelper<T extends SqliteBaseEntity> {
     public void createInsert(T target) {
         List<Object> param = new Vector<Object>();
         StringBuffer sqlBuffer = new StringBuffer();
-        sqlBuffer.append("INSERT INTO ").append(this.getTableName(target)).append("(");
+        sqlBuffer.append("INSERT INTO ").append(this.getTableName(target,true)).append("(");
         for (Field field : this.columnFields) {
             if (!Modifier.isStatic(field.getModifiers())) {
                 SqliteID id = field.getAnnotation(SqliteID.class);
@@ -400,6 +400,16 @@ public class SqliteSqlHelper<T extends SqliteBaseEntity> {
      * @return
      */
     public String getTableName(T target) {
+        return this.getTableName(target,false);
+    }
+
+    /**
+     * 根据注解获取表名
+     * @param target
+     * @param needCreateTable 是否需要判断并自动创建表
+     * @return
+     */
+    public String getTableName(T target,boolean needCreateTable) {
         if (SqliteUtils.isBlank(this.tableName)) {
             this.tableName = this.getTableNameForClass(this.targetClass);
         }
@@ -413,8 +423,10 @@ public class SqliteSqlHelper<T extends SqliteBaseEntity> {
                     joinStr = splitAnnotation.joinStr();
                 }
                 String currentTableName = new StringBuffer(this.tableName).append(joinStr).append(fieldValue).toString();
-                String creatTableSql = this.createTableSql(currentTableName);
-                target.setNeedCreateBefSql(creatTableSql);
+                if(needCreateTable) {
+                    String creatTableSql = this.createTableSql(currentTableName);
+                    target.setNeedCreateBefSql(creatTableSql);
+                }
                 return currentTableName;
             }
         }

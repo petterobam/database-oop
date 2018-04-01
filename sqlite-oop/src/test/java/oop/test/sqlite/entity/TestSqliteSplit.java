@@ -8,7 +8,7 @@ import oop.sqlite.annotation.SqliteTransient;
 import oop.sqlite.config.SqliteConfig;
 
 /**
- * 测试表对应实体类
+ * 测试分库表对应实体类
  *
  * @author 欧阳洁
  * @create 2017-09-30 9:44

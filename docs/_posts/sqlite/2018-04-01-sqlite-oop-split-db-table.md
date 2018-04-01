@@ -16,6 +16,7 @@ redirect_from:
 两种做法都是对数据的存储处理，但是都有适用各自的场景：
 
 分库有如下优劣：
+
   - 业务间独立拆分，减少数据底层操作的干扰
   - 业务拆分后，降低每个业务线数据维护成本
   - 扩展数据库连接数，提升吞吐性能
@@ -25,6 +26,7 @@ redirect_from:
   - 不同库的写入，事务管理困难
 
 分表有如下优劣：
+
   - 大表数据拆分，同类数据聚合
   - 多表操作，并发性能提高
   - 没有表的规则控制，数据的验证和唯一性之类放到应用端
@@ -34,7 +36,8 @@ redirect_from:
 
 ### 分库
 
-1. 让表可以配置库源
+#### 让表可以配置库源
+
   - 扩展表注解：实现表与库的关联，控制每个表对应的库
 
   ```java
@@ -79,7 +82,7 @@ redirect_from:
   public static final int DB_TYPE_BY_YEAR = 5;//按年自动分库
   ```
 
-2. 处理库源
+#### 处理库源
 
   - 静态加载：每个服务注入的时候，对应自己加载每个表的 dbPath
 
@@ -143,75 +146,81 @@ redirect_from:
 
 ### 分表
 
-1. 定义分表标记：分表注解，编辑考虑定义属性注解，可以和非表字段标识注解同用，决定要不要把分表标识规则存进数据库，可以对表实体类二次继承多个，写死分表字段，达到静态分表
+#### 定义分表标记
 
-  ```java
-  /**
-   * 分表属性注解
-   * @author 欧阳洁
-   */
-  @java.lang.annotation.Target(value = {java.lang.annotation.ElementType.FIELD})
-  @java.lang.annotation.Retention(value = java.lang.annotation.RetentionPolicy.RUNTIME)
-  public @interface SqliteTableSplit {
-      /**
-       * 后缀链接字符
-       * @return
-       */
-      String joinStr() default "_";
-  }
-  ```
+分表注解，编辑考虑定义属性注解，可以和非表字段标识注解同用，决定要不要把分表标识规则存进数据库，可以对表实体类二次继承多个，写死分表字段，达到静态分表
 
-2. 记录分表属性：服务注入时候检测并记录分表属性（Field），在生成SQL的时候动态获取表名
+```java
+/**
+ * 分表属性注解
+ * @author 欧阳洁
+ */
+@java.lang.annotation.Target(value = {java.lang.annotation.ElementType.FIELD})
+@java.lang.annotation.Retention(value = java.lang.annotation.RetentionPolicy.RUNTIME)
+public @interface SqliteTableSplit {
+    /**
+     * 后缀链接字符
+     * @return
+     */
+    String joinStr() default "_";
+}
+```
 
-  ```java
-  /**
-   * 根据注解获取表名
-   * @param target
-   * @param needCreateTable 是否需要判断并自动创建表
-   * @return
-   */
-  public String getTableName(T target,boolean needCreateTable) {
-      if (SqliteUtils.isBlank(this.tableName)) {
-          this.tableName = this.getTableNameForClass(this.targetClass);
-      }
-      //启用分表功能后，动态获取表名，并生成建表SQL
-      if (null != this.tableSplitField) {
-          String fieldValue = (String) this.readField(this.tableSplitField, target);
-          if (!SqliteUtils.isBlank(fieldValue)) {
-              String joinStr = "_";
-              SqliteTableSplit splitAnnotation = this.tableSplitField.getAnnotation(SqliteTableSplit.class);
-              if (null != splitAnnotation) {
-                  joinStr = splitAnnotation.joinStr();
-              }
-              String currentTableName = new StringBuffer(this.tableName).append(joinStr).append(fieldValue).toString();
-              if(needCreateTable) {
-                  String creatTableSql = this.createTableSql(currentTableName);
-                  target.setNeedCreateBefSql(creatTableSql);
-              }
-              return currentTableName;
-          }
-      }
-      return this.tableName;
-  }
-  ```
+#### 记录分表属性
 
-3. 插入的时候表存在判断，并在不存在时候自动建表
+服务注入时候检测并记录分表属性（Field），在生成SQL的时候动态获取表名
 
-  ```java
-  /**
-   * 插入
-   * @param entity
-   * @return
-   */
-  public int insert(T entity) {
-      this.sqlHelper.createInsert(entity);
-      if(!SqliteUtils.isBlank(entity.getNeedCreateBefSql())){
-          //插入数据之前判断是否需要建表
-          this.sqliteHelper.execute(entity.getNeedCreateBefSql());
-      }
-      return this.sqliteHelper.insert(entity.getCurrentSql(), entity.getCurrentParam());
-  }
-  ```
+```java
+/**
+ * 根据注解获取表名
+ * @param target
+ * @param needCreateTable 是否需要判断并自动创建表
+ * @return
+ */
+public String getTableName(T target,boolean needCreateTable) {
+    if (SqliteUtils.isBlank(this.tableName)) {
+        this.tableName = this.getTableNameForClass(this.targetClass);
+    }
+    //启用分表功能后，动态获取表名，并生成建表SQL
+    if (null != this.tableSplitField) {
+        String fieldValue = (String) this.readField(this.tableSplitField, target);
+        if (!SqliteUtils.isBlank(fieldValue)) {
+            String joinStr = "_";
+            SqliteTableSplit splitAnnotation = this.tableSplitField.getAnnotation(SqliteTableSplit.class);
+            if (null != splitAnnotation) {
+                joinStr = splitAnnotation.joinStr();
+            }
+            String currentTableName = new StringBuffer(this.tableName).append(joinStr).append(fieldValue).toString();
+            if(needCreateTable) {
+                String creatTableSql = this.createTableSql(currentTableName);
+                target.setNeedCreateBefSql(creatTableSql);
+            }
+            return currentTableName;
+        }
+    }
+    return this.tableName;
+}
+```
+
+#### 自动建表
+
+插入的时候表存在判断，并在不存在时候自动建表
+
+```java
+/**
+ * 插入
+ * @param entity
+ * @return
+ */
+public int insert(T entity) {
+    this.sqlHelper.createInsert(entity);
+    if(!SqliteUtils.isBlank(entity.getNeedCreateBefSql())){
+        //插入数据之前判断是否需要建表
+        this.sqliteHelper.execute(entity.getNeedCreateBefSql());
+    }
+    return this.sqliteHelper.insert(entity.getCurrentSql(), entity.getCurrentParam());
+}
+```
 
 ## 单元测试
 

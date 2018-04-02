@@ -1,5 +1,6 @@
 package oop.test.sqlite;
 
+import oop.sqlite.config.SqliteConfig;
 import oop.sqlite.utils.SqliteHelper;
 import oop.test.sqlite.entity.TestTable;
 import oop.test.sqlite.service.TestTableService;
@@ -15,6 +16,10 @@ import java.util.List;
  * @create 2017-09-29 18:10
  **/
 public class SqliteTest {
+    @Test
+    public void test() throws ClassNotFoundException {
+        System.out.println(SqliteConfig.getUri());
+    }
     @Test
     public void test1() throws ClassNotFoundException {
         SqliteHelper.test();

@@ -11,7 +11,7 @@ public class EsLogUtils {
      * @param argArray
      */
     public static final void info(String messagePattern, Object... argArray) {
-        StringBuffer info = new StringBuffer("[info]");
+        StringBuffer info = new StringBuffer("[elasticsearch-oop]-[info]");
         info.append("-[").append(new Date()).append("]");
         // TODO： 代理获取调用类的类名信息、方法名信息等等
         info.append("-[").append(print(messagePattern,argArray)).append("]");
@@ -24,7 +24,7 @@ public class EsLogUtils {
      * @param argArray
      */
     public static final void error(String messagePattern, Object... argArray) {
-        StringBuffer info = new StringBuffer("[error]");
+        StringBuffer info = new StringBuffer("[elasticsearch-oop]-[error]");
         info.append("-[").append(new Date()).append("]");
         // TODO： 代理获取调用类的类名信息、方法名信息等等
         info.append("-[").append(print(messagePattern,argArray)).append("]");
@@ -37,7 +37,7 @@ public class EsLogUtils {
      * @param argArray
      */
     public static final void debug(String messagePattern, Object... argArray) {
-        StringBuffer info = new StringBuffer("[debug]");
+        StringBuffer info = new StringBuffer("[elasticsearch-oop]-[debug]");
         info.append("-[").append(new Date()).append("]");
         // TODO： 代理获取调用类的类名信息、方法名信息等等
         info.append("-[").append(print(messagePattern,argArray)).append("]");

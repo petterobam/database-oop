@@ -1,5 +1,6 @@
 package oop.elasticsearch.base;
 
+import oop.elasticsearch.config.ElasticsearchConfig;
 import oop.elasticsearch.utils.EsJsonUtils;
 import oop.elasticsearch.utils.EsLogUtils;
 import oop.elasticsearch.utils.EsUtils;
@@ -55,6 +56,20 @@ public abstract class EsBaseService {
      * 服务
      */
     private TransportClient client;
+
+    public EsBaseService(){
+        this.client = ElasticsearchConfig.getClient();
+    }
+    public EsBaseService(TransportClient client){
+        this.client = client;
+    }
+
+    /**
+     * 关闭client
+     */
+    public void closeClient(){
+        client.close();
+    }
     /**
      * 获取连接
      *
@@ -68,7 +83,9 @@ public abstract class EsBaseService {
      *
      * @param client
      */
-    public abstract void setClient(TransportClient client);
+    public void setClient(TransportClient client){
+        this.client = client;
+    }
 
     /**
      * 获取索引管理

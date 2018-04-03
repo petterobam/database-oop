@@ -26,8 +26,6 @@ import java.util.Map;
  * @create 2017-09-29 17:48
  **/
 public class SqliteHelper {
-    private static final String TEST_DB_PATH = SqliteUtils.getClassRootPath(SqliteConfig.TEST_DB_PATH);
-
     private String dbPath;//数据库路径
     private int dbType;//数据库类型
 
@@ -37,13 +35,14 @@ public class SqliteHelper {
      * @param targetClass
      */
     public SqliteHelper(Class<?> targetClass) {
-        this.dbPath = SqliteConfig.DB_PATH;
+        this.dbPath = SqliteUtils.isBlank(SqliteConfig.getUri()) ? SqliteConfig.DB_PATH : SqliteConfig.getUri();
         this.dbType = SqliteConfig.DB_TYPE_DEFAULT;
         SqliteTable sqliteTable = targetClass.getAnnotation(SqliteTable.class);
         if (null != sqliteTable) {
             this.dbPath = sqliteTable.dbPath();
             this.dbType = sqliteTable.dbType();
         }
+        // 默认相对路径
         this.dbPath = SqliteUtils.getClassRootPath(this.dbPath);
     }
 
@@ -54,7 +53,7 @@ public class SqliteHelper {
      */
     public SqliteHelper(String dbPath, boolean absolute) {
         if (SqliteUtils.isBlank(dbPath)) {
-            this.dbPath = SqliteConfig.DB_PATH;
+            this.dbPath = SqliteUtils.isBlank(SqliteConfig.getUri()) ? SqliteConfig.DB_PATH : SqliteConfig.getUri();
         } else {
             this.dbPath = dbPath;
         }
@@ -71,9 +70,10 @@ public class SqliteHelper {
      */
     public SqliteHelper(String dbPath) {
         if (SqliteUtils.isBlank(dbPath)) {
-            this.dbPath = SqliteConfig.DB_PATH;
+            this.dbPath = SqliteUtils.isBlank(SqliteConfig.getUri()) ? SqliteConfig.DB_PATH : SqliteConfig.getUri();
         }
         this.dbType = SqliteConfig.DB_TYPE_DEFAULT;
+        // 默认相对路径
         this.dbPath = SqliteUtils.getClassRootPath(this.dbPath);
     }
 
@@ -156,7 +156,7 @@ public class SqliteHelper {
      * @return
      */
     private String getDBUrl() {
-        StringBuffer currentDbPathSb = new StringBuffer(this.dbPath);
+        StringBuffer currentDbPathSb = new StringBuffer("jdbc:sqlite:/").append(this.dbPath);
         switch (this.dbType) {
             case SqliteConfig.DB_TYPE_BY_MINUTE:
                 currentDbPathSb.append(SqliteUtils.nowFormatStr("yyyyMMddHHmm")).append(".db");
@@ -176,12 +176,9 @@ public class SqliteHelper {
             default:
                 break;
         }
-        String currentDbPath = currentDbPathSb.toString();
-        String JDBC_URL = null;
+        String JDBC_URL = currentDbPathSb.toString();
         if (SqliteUtils.isWindows()) {
-            JDBC_URL = "jdbc:sqlite:/" + currentDbPath.toLowerCase();
-        } else {
-            JDBC_URL = "jdbc:sqlite:/" + currentDbPath;
+            return JDBC_URL.toLowerCase();
         }
         return JDBC_URL;
     }
@@ -209,36 +206,6 @@ public class SqliteHelper {
      */
     public String queryJsonResult(String sql) {
         return this.queryJsonResult(sql, null);
-    }
-
-    /**
-     * 获取查询条数的结果
-     * @param sql
-     * @return
-     */
-    public int queryCountResult(String sql){
-        Connection connection = null;
-        try {
-            // create a database connection
-            String JDBC_URL = this.getDBUrl();
-            connection = DriverManager.getConnection(JDBC_URL);
-            Statement statement = connection.createStatement();
-            statement.setQueryTimeout(300); // set timeout to 30 sec.
-            System.out.println("执行查询语句==> " + sql);
-            ResultSet rs = statement.executeQuery(sql);
-
-            rs.next();//第一行
-            return rs.getInt(1);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return 0;
-        } finally {
-            try {
-                if (connection != null) connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     /**
@@ -310,6 +277,37 @@ public class SqliteHelper {
             }
         }
     }
+
+    /**
+     * 获取查询条数的结果
+     * @param sql
+     * @return
+     */
+    public int queryCountResult(String sql){
+        Connection connection = null;
+        try {
+            // create a database connection
+            String JDBC_URL = this.getDBUrl();
+            connection = DriverManager.getConnection(JDBC_URL);
+            Statement statement = connection.createStatement();
+            statement.setQueryTimeout(300); // set timeout to 30 sec.
+            System.out.println("执行查询语句==> " + sql);
+            ResultSet rs = statement.executeQuery(sql);
+
+            rs.next();//第一行
+            return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        } finally {
+            try {
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     /**
      * 查询条数语句执行，返回条数，带参数
      *
@@ -778,6 +776,7 @@ public class SqliteHelper {
     public static void test() {
         Connection connection = null;
         try {
+            String TEST_DB_PATH = SqliteUtils.getClassRootPath(SqliteConfig.TEST_DB_PATH);
             // create a database connection
             String connectStr = getDBUrl(TEST_DB_PATH);
             connection = DriverManager.getConnection(connectStr);

@@ -87,14 +87,10 @@ database-oop
 
 6. git提交备注以 ```docs:``` 打头,可以参考这种格式 ```docs:存储系统英文名:文档标题[init/修改]...``` 
 
-7. 该博客的评论系统是基于该项目的issue，当你写完某一篇博客后，可以打开文章页面看一下，在文章最下面是github博客评论处，点击 Initialize Commit 会在项目issue下面添加一个issue，添加规则为 issue标题为 ```文章标题 | Database-OOP``` ，issue内容为这篇文章的链接，然后不管在博客里面评论还是在issue里面回复都可以在评论列表里面看到
-
-    ![gitment-init](/images/about-database-oop/gitment-init.png)
-
-    ![gitment-issue](/images/about-database-oop/gitment-issue.png)
+7. 该博客的评论系统采用 [gitment](https://github.com/imsun/gitment?_blank) ，内容是基于该项目的issue。当你写完某一篇博客后，可以打开文章页面看一下，在文章最下面是github博客评论处，点击 ```Initialize Commit``` 会在项目 issue模块 下面添加一个 issue ，添加规则为： issue标题为 ```文章标题 | Database-OOP``` ，issue内容为 这篇文章的链接，然后不管在博客里面评论还是在issue里面回复都可以在评论列表里面看到 ```^_^```
 
     ![gitment-show-list](/images/about-database-oop/gitment-show-list.png)
-
+    
 ## 代码提交
 
 1. 代码提交备注以 ```子项目名:``` 打头，可以参考这种格式 ```[子项目名/存储系统英文名]:[功能描述/BUG描述][新增/修改/调整/改进]...```

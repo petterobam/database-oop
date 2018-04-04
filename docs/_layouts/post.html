@@ -67,6 +67,12 @@ layout: blog
                 </div>
             </footer>
             <div class="misc-content">
+                {% if site.gitment.owner and site.gitment.repo and site.gitment.oauth_client_id and site.gitment.oauth_client_secret %}
+                    <div id="container"></div>
+                    {% include common/gitment.html %}
+                {% endif %}
+            </div>
+            <!--<div class="misc-content">
                 {% if site.disqus.shortname and page.comments != false %}
                     {% include common/disqus.html %}
                     <div class="comments">
@@ -74,7 +80,7 @@ layout: blog
                         <div id="disqus_thread"></div>
                     </div>
                 {% endif %}
-            </div>
+            </div>-->
         </div>
     </div>
 </article>

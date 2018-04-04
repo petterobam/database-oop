@@ -1,0 +1,14 @@
+<link rel="stylesheet" href="{{ site.baseurl }}/gitments/default.css">
+<script src="{{ site.baseurl }}/gitments/gitment.browser.js"></script>
+<script>
+    var gitment = new Gitment({
+        //id: '页面 ID', // 可选。默认为 location.href
+        owner: '{{ site.gitment.owner }}',
+        repo: '{{ site.gitment.repo }}',
+        oauth: {
+            client_id: '{{ site.gitment.oauth_client_id }}',
+            client_secret: '{{ site.gitment.oauth_client_secret }}',
+        }
+    });
+    gitment.render('container');
+</script>

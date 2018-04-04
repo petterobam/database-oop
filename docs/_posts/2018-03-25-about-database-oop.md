@@ -79,14 +79,21 @@ database-oop
 
 3. 每个MarkDown文件的开始，要包含如下格式，用于建立博客的文档的索引和标签，格式出错会影响文章的显示效果，（PS:默认author是所有项目博客参与人，可以添加 ```author: "petterobam"``` ，改变author）
 
-![database-oop-head](/images/about-database-oop/about-database-oop-head.png)
-
+    ![database-oop-head](/images/about-database-oop/about-database-oop-head.png)
 
 4. 每个MarkDown文件名以 yyyy-MM-dd-自定义英文标题.md 前面的日期用于索引，后面的英文标题用于uri链接定位，如 上面地址栏本文档链接
 
 5. 每个MarkDown文件用到的图片资源在```docs/_images/```下，如用到图片，请放到 ```docs/_images/自定义英文标题/```文件夹下面，防止文档图片资源混乱
 
 6. git提交备注以 ```docs:``` 打头,可以参考这种格式 ```docs:存储系统英文名:文档标题[init/修改]...``` 
+
+7. 该博客的评论系统是基于该项目的issue，当你写完某一篇博客后，可以打开文章页面看一下，在文章最下面是github博客评论处，点击 Initialize Commit 会在项目issue下面添加一个issue，添加规则为 issue标题为 ```文章标题 | Database-OOP``` ，issue内容为这篇文章的链接，然后不管在博客里面评论还是在issue里面回复都可以在评论列表里面看到
+
+    ![gitment-init](/images/about-database-oop/gitment-init.png)
+
+    ![gitment-issue](/images/about-database-oop/gitment-issue.png)
+
+    ![gitment-show-list](/images/about-database-oop/gitment-show-list.png)
 
 ## 代码提交
 

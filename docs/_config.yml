@@ -74,3 +74,4 @@ paths:
   categories: /blog/categories/
   tags: /blog/tags/
   about: /about/index.html
+  api: /api-doc/guide.html

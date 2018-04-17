@@ -1,0 +1,373 @@
+<!doctype HTML>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+    <title>##page.title##</title>
+    <style>
+        body {
+            color: #333;
+            font-family: sans-serif;
+            font-size: 12pt;
+            line-height: 170%;
+            padding: 0 30px 0 270px;
+        }
+
+        header .banner {
+            margin: 0 0 1em 0;
+        }
+
+        header .banner, nav .banner {
+            color: #777;
+            font-size: 10pt;
+            font-weight: bold;
+        }
+
+        header h1 {
+            background: #0c3;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 24pt;
+            margin: 0;
+            padding: 1.2em 0;
+            text-align: center;
+        }
+
+        nav {
+            font-size: 10pt;
+            overflow-x: hidden;
+            overflow-y: auto;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 240px;
+        }
+
+        nav .menubar {
+            border-bottom: solid 1px #ccc;
+            display: none;
+            height: 48px;
+            line-height: 48px;
+            padding: 0 10px;
+        }
+
+        nav .button {
+            background: #777;
+            border: 1px solid #333;
+            color: #fff;
+            font-size: 10pt;
+            font-weight: bold;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        nav ul {
+            padding: 0 0 0 10px;
+        }
+
+        nav ul a {
+            color: #333;
+            text-decoration: none;
+        }
+
+        nav ul a:hover {
+            text-decoration: underline;
+        }
+
+        nav li {
+            line-height: 180%;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav .level2 {
+            font-size: 11pt;
+            font-weight: bold;
+        }
+
+        nav .level3 {
+            padding-left: 1em;
+        }
+
+        nav .level3:before {
+            content: "» ";
+        }
+
+        nav .level4 {
+            padding-left: 2em;
+        }
+
+        nav .level4:before {
+            content: "› ";
+        }
+
+        article h2 {
+            border-bottom: dotted 1px #777;
+            font-size: 12pt;
+            line-height: 100%;
+            margin: 4em 0 1em 0;
+            padding: 0 0 0.3em 0;
+        }
+
+        article h3 {
+            font-size: 12pt;
+            line-height: 100%;
+            margin: 2em 0 1em 0;
+            padding: 0;
+        }
+
+        article h4 {
+            font-size: 12pt;
+            font-style: italic;
+            font-weight: normal;
+            line-height: 100%;
+            margin: 1.2em 0 1em 0;
+            padding: 0;
+        }
+
+        article p {
+            margin: 1em 0;
+        }
+
+        article p code {
+            background: #eee;
+            border: 1px solid #ccc;
+        }
+
+        article p strong {
+            color: #f00;
+        }
+
+        article pre {
+            background: #eee;
+            border-left: solid 2px #3c0;
+            font-size: 10pt;
+            margin: 1em 0;
+            padding: 0 0 0 1em;
+            overflow-x: auto;
+            overflow-y: padding;
+        }
+
+        article blockquote {
+            background: #fff;
+            border: dashed 1px #777;
+            border-left: solid 2px #777;
+            color: #000;
+            margin: 0;
+            padding: 0 0 0 1em;
+        }
+
+        article ul, article ol {
+            padding-left: 2em;
+        }
+
+        footer {
+            border-top: 1px solid #ccc;
+            font-size: 10pt;
+            margin-top: 4em;
+        }
+
+        @media (max-width: 768px) {
+
+            body {
+                padding: 0 10px 0 230px;
+            }
+
+            nav {
+                width: 230px;
+            }
+
+        }
+
+        @media (max-width: 480px) {
+
+            body {
+                padding: 64px 10px 0 10px;
+            }
+
+            header .banner {
+                display: none;
+            }
+
+            nav {
+                position: absolute;
+                width: 100%;
+            }
+
+            nav .menubar {
+                display: block;
+            }
+
+            nav .banner {
+                float: right;
+            }
+
+            nav ul {
+                background: #fff;
+                display: none;
+                font-size: 14pt;
+                margin: 0;
+                padding: 0 0 0 8px;
+            }
+
+            nav .level2 {
+                font-size: 16pt;
+                font-weight: bold;
+            }
+
+            nav li {
+                line-height: 240%;
+            }
+
+            .index nav ul {
+                display: block;
+            }
+
+            .index article {
+                display: none;
+            }
+
+        }
+    </style>
+    <script>
+        (function (tags) {
+            var i = 0, len = tags.length;
+
+            for (; i < len; ++i) {
+                document.createElement(tags[i]);
+            }
+        }(['header', 'nav', 'article', 'footer']));
+    </script>
+</head>
+<body>
+<header>
+    <h1 id="big-title">##page.title##</h1>
+</header>
+<nav>
+    <div class="menubar">
+        <a class="button">&#9776;&nbsp;目录索引</a>
+    </div>
+    <div id="java-nav-directory">##page.nav##</div>
+    <div id="js-nav-directory"></div>
+</nav>
+<article id="article-content">
+    ##page.article##
+</article>
+<footer>
+    <p>© ##page.inc##, Inc.</p>
+</footer>
+<script>
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-48219044-1', 'auto');
+    ga('send', 'pageview');
+
+</script>
+<script>
+    /*备用文章目录动态生成*/
+    var articleDirectoryBuild = function () {
+        var articleChildren = function children(childNodes, reg) {
+                var result = [],
+                    isReg = typeof reg === 'object',
+                    isStr = typeof reg === 'string',
+                    node, i, len;
+                for (i = 0, len = childNodes.length; i < len; i++) {
+                    node = childNodes[i];
+                    if ((node.nodeType === 1 || node.nodeType === 9) &&
+                        (!reg ||
+                            isReg && reg.test(node.tagName.toLowerCase()) ||
+                            isStr && node.tagName.toLowerCase() === reg)) {
+                        result.push(node);
+                    }
+                }
+                return result;
+            };
+        var createPostDirectory = function (article, directory, isDirNum) {
+                var contentArr = [],
+                    titleId = [],
+                    levelArr, root, level,
+                    currentList, list, li, link, i, len;
+                levelArr = (function (article, contentArr, titleId) {
+                    var titleElem = articleChildren(article.childNodes, /^h\d$/),
+                        levelArr = [],
+                        lastNum = 1,
+                        lastRevNum = 1,
+                        count = 0,
+                        guid = 1,
+                        id = 'directory' + (Math.random() + '').replace(/\D/, ''),
+                        lastRevNum, num, elem;
+                    while (titleElem.length) {
+                        elem = titleElem.shift();
+                        contentArr.push(elem.innerHTML);
+                        num = +elem.tagName.match(/\d/)[0];
+                        if (num > lastNum) {
+                            levelArr.push(1);
+                            lastRevNum += 1;
+                        } else if (num === lastRevNum ||
+                            num > lastRevNum && num <= lastNum) {
+                            levelArr.push(0);
+                            lastRevNum = lastRevNum;
+                        } else if (num < lastRevNum) {
+                            levelArr.push(num - lastRevNum);
+                            lastRevNum = num;
+                        }
+                        count += levelArr[levelArr.length - 1];
+                        lastNum = num;
+                        elem.id = elem.id || (id + guid++);
+                        titleId.push(elem.id);
+                    }
+                    if (count !== 0 && levelArr[0] === 1) levelArr[0] = 0;
+
+                    return levelArr;
+                })(article, contentArr, titleId);
+                currentList = root = document.createElement('ul');
+                dirNum = [0];
+                for (i = 0, len = levelArr.length; i < len; i++) {
+                    level = levelArr[i];
+                    if (level === 1) {
+                        list = document.createElement('ul');
+                        if (!currentList.lastElementChild) {
+                            currentList.appendChild(document.createElement('li'));
+                        }
+                        currentList.lastElementChild.appendChild(list);
+                        currentList = list;
+                        dirNum.push(0);
+                    } else if (level < 0) {
+                        level *= 2;
+                        while (level++) {
+                            if (level % 2) dirNum.pop();
+                            currentList = currentList.parentNode;
+                        }
+                    }
+                    dirNum[dirNum.length - 1]++;
+                    li = document.createElement('li');
+                    link = document.createElement('a');
+                    link.href = '#' + titleId[i];
+                    link.innerHTML = !isDirNum ? contentArr[i] :
+                        dirNum.join('.') + ' ' + contentArr[i];
+                    li.appendChild(link);
+                    currentList.appendChild(li);
+                }
+                directory.appendChild(root);
+            };
+        createPostDirectory(document.getElementById('article-content'), document.getElementById('js-nav-directory'), true);
+    };
+    var javaDirEle = document.getElementById('java-nav-directory');
+    if (null != javaDirEle && javaDirEle.innerHTML == "") {
+        articleDirectoryBuild();
+    }
+</script>
+</body>
+</html>

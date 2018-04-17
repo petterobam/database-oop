@@ -1,0 +1,11 @@
+page:
+  title: 引导使用多个MarkDown文件生成单页面索引静态HTML文件
+  inc: 2018 petterObam #作者信息等
+  useArgsPathForJar: true  # 如果设置该配置false，jar文件将完全按照配置文件执行，此时mdBasePath、tplPath、indexPath必填
+  mdBasePath:    # markdown文件的目录，默认为 当前:markdowns/ ，绝对路径
+  tplPath:    # index模板文件的路径，默认为 当前:template/index.html ，绝对路径
+  markdowns:
+    - 00_header.md
+    - 01_getting_started.md
+    - 02_more_self_setting.md
+  indexPath:  # 生成的index文件输出路径，默认 当前:index.html ，绝对路径

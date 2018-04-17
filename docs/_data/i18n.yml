@@ -1,5 +1,6 @@
 en: &en
   about: 'About'
+  api: 'API DOCS'
   topic: 'Home Topic'
   articles: 'Articles'
   back_to_top: 'Back to Top'
@@ -40,6 +41,7 @@ en-nz:
   <<: *en
 zh: &zh
   about: '关于'
+  api: 'API文档'
   topic: '主题展示'
   articles: '文章列表'
   back_to_top: '返回顶部'

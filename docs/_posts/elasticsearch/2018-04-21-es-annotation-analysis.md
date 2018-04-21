@@ -77,9 +77,9 @@ redirect_from:
 
 ### @EsFields({...})
 
-1. 自定义Mapping方式之一，粒度细化定义
+自定义Mapping方式之一，粒度细化定义
 
-2. 定义 type ， 默认 string
+#### 定义 type ， 默认 string
 
   - 简单域类型
     * 字符串: ```string```, ```text```, ```keyword```
@@ -103,7 +103,7 @@ redirect_from:
     * 渗滤器类型：```percolator```, 接受来自```query-dsl```的查询
     * [```join``` 数据类型](https://www.elastic.co/guide/en/elasticsearch/reference/current/parent-join.html)：```join```, 为相同索引内的文档定义父/子关系
 
-3. 额外属性定义
+#### 额外属性定义
 
   - ```index``` ，定义索引类型 ， 空则不定义，默认 ```analyzed```
     * ```analyzed``` 首先分析字符串，然后索引它。换句话说，以全文索引这个域。```@字符串类型专用```
@@ -174,7 +174,7 @@ redirect_from:
 
   - ```properties``` ， ```object```、```nested```字段里面定义字段，一般用于```List```或```Map```这种弱类型字段定义
 
-4. 元字段定义的属性
+#### 元字段定义的属性
 
   类中定义元字段，而这些元字段不属于文档本身，但是可以丰富扩展ES的功能，只有如下的元字段才可以定义的属性一般为```enabled```，启用或禁用。
 

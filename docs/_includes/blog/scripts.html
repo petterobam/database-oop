@@ -3,15 +3,27 @@ $(document).ready(function () {
     var offset = 50,
         duration = 500,
         width = 960;
+    var dirOldTop = 37;
     $(window).scroll(function () {
-        if ($(window).width() > width) {
-            if ($(this).scrollTop() > offset) {
+      var scrollTop = $(this).scrollTop();
+        if (scrollTop > width) {
+            if (scrollTop > offset) {
                 $('footer').css('top', '20px');
                 $('footer .back-to-top').fadeIn(duration);
             } else {
                 $('footer').css('top', 'auto');
                 $('footer .back-to-top').fadeOut(duration);
             }
+        }
+        var directory = $("#directory");
+        if(null != directory && directory.length > 0){
+          var top;
+          if(scrollTop > dirOldTop){
+            top = (scrollTop - dirOldTop) + "px";
+          }else{
+            top = dirOldTop + "px";
+          }
+          directory.css("top",top);
         }
     });
     $(window).resize(function () {

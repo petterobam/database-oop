@@ -1,23 +1,137 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>API GUIDE 文档</title>
-</head>
-<body>
-    <ul>
-        <li><a target="_blank" href="access-oop/index.html">access-oop-api</a></li>
-        <li><a target="_blank" href="arangodb-oop/index.html">arangodb-oop-api</a></li>
-        <li><a target="_blank" href="db2-oop/index.html">db2-oop-api</a></li>
-        <li><a target="_blank" href="elasticsearch-oop/index.html">elasticsearch-oop-api</a></li>
-        <li><a target="_blank" href="mongodb-oop/index.html">mongodb-oop-api</a></li>
-        <li><a target="_blank" href="mysql-oop/index.html">mysql-oop-api</a></li>
-        <li><a target="_blank" href="oracle-oop/index.html">oracle-oop-api</a></li>
-        <li><a target="_blank" href="postgresql-oop/index.html">postgresql-oop-api</a></li>
-        <li><a target="_blank" href="redis-oop/index.html">redis-oop-api</a></li>
-        <li><a target="_blank" href="sqlite-oop/index.html">sqlite-oop-api</a></li>
-        <li><a target="_blank" href="sqlserver-oop/index.html">sqlserver-oop-api</a></li>
-        <li><a target="_blank" href="xml-oop/index.html">xml-oop-api</a></li>
-    </ul>
-</body>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<title>guide</title>
+		<link rel="stylesheet" href="static/css/bootstrap.min.css" />
+		<script type="text/javascript" src="static/js/jquery-1.10.1.min.js" ></script>
+		<script type="text/javascript" src="static/js/bootstrap.min.js" ></script>
+	</head>
+	<style>
+		body{
+			margin: 0;
+			padding: 0;
+			font-family: "微软雅黑";
+		}
+		a:hover{
+			text-decoration: none;
+		}
+		.project-header{
+		    width: 60%;
+		    text-align: center;
+		    margin: 60px 0 10px;
+		    font-weight: 200;
+		    margin-bottom: 40px;
+		    display: block;
+		    margin-left: auto;
+		    margin-right: auto;
+	        padding-bottom: 9px;
+		    border-bottom: 1px solid #eee;									
+		}
+		.thumbnail{
+		    margin-left: auto;
+		    margin-right: auto;
+		    max-width: 310px;
+		    margin-bottom: 30px;
+		    border-radius: 0;
+		    padding: 4px;
+		    border: 1px solid #DDDDDD;
+		}
+		.thumbnail img{
+		    max-width: 100%;
+    		height: auto;
+		}
+		.thumbnail .caption{
+		    height: 200px;
+		    overflow-y: hidden;
+		    color: #555;
+		    padding: 9px;
+		}
+		h3{
+			font-size: 22px;
+			text-align: center;
+		}
+		small{
+			color: #777;
+		}
+	</style>
+	<body>
+		<div class="container">
+			<div class="project-header">
+				<h2>database-oop</h2>
+				<p>结构化数据存储系统的面向对象封装</p>
+			</div>
+			<div class="row">
+				
+			</div>
+		</div>
+	</body>
+	<script>
+		var itemsArray = [
+			{
+				itemHref: 'access-oop/index.html',
+				itemName: 'access-oop-api'
+			},
+			{
+				itemHref: 'arangodb-oop/index.html',
+				itemName: 'arangodb-oop-api'
+			},
+			{
+				itemHref: 'db2-oop/index.html',
+				itemName: 'db2-oop-api'
+			},
+			{
+				itemHref: 'elasticsearch-oop/index.html',
+				itemName: 'elasticsearch-oop-api'
+			},
+			{
+				itemHref: 'mongodb-oop/index.html',
+				itemName: 'mongodb-oop-api'
+			},
+			{
+				itemHref: 'mysql-oop/index.html',
+				itemName: 'mysql-oop-api'
+			},
+			{
+				itemHref: 'oracle-oop/index.html',
+				itemName: 'oracle-oop-api'
+			},
+			{
+				itemHref: 'postgresql-oop/index.html',
+				itemName: 'postgresql-oop-api'
+			},
+			{
+				itemHref: 'redis-oop/index.html',
+				itemName: 'redis-oop-api'
+			},
+			{
+				itemHref: 'sqlite-oop/index.html',
+				itemName: 'sqlite-oop-api'
+			},
+			{
+				itemHref: 'sqlserver-oop/index.html',
+				itemName: 'sqlserver-oop-api'
+			},
+			{
+				itemHref: 'xml-oop/index.html',
+				itemName: 'xml-oop-api'
+			}
+		]
+		
+		var html = '';
+		for(var i=0; i<itemsArray.length; i++){
+			html+= '<div class="col-sm-6 col-md-4 col-lg-3">';
+			html+= '<div class="thumbnail">';
+			html+= '<a href="'+itemsArray[i].itemHref+'" target="_blank" title="'+itemsArray[i].itemName+'">';
+			html+= '<img src="static/img/oracle.jpg" width="300" height="150" alt="'+itemsArray[i].itemName+'"/>';
+			html+= '</a><div class="caption">';
+			html+= '<h3><a href="'+itemsArray[i].itemHref+'" target="_blank" title="'+itemsArray[i].itemName+'">'+itemsArray[i].itemName+'<br>';
+			html+= '<small>api</small></a>';
+			html+= '</h3><p>这里是引导使用如何将多个用MarkDown文档写的api文档生成单页面带索引的HTML文档，就像Vue.js或beetl的guide文档一样</p>';
+			html+= '</div></div></div>';
+		}
+		
+		$('.row').html(html);
+	</script>
 </html>

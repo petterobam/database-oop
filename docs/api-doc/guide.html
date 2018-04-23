@@ -59,7 +59,7 @@
 	<body>
 		<div class="container">
 			<div class="project-header">
-				<h2>database-oop</h2>
+				<h2 onclick="javascript:location.href='/blog'" style="cursor: pointer;">database-oop</h2>
 				<p>结构化数据存储系统的面向对象封装</p>
 			</div>
 			<div class="row">
@@ -71,51 +71,63 @@
 		var itemsArray = [
 			{
 				itemHref: 'access-oop/index.html',
-				itemName: 'access-oop-api'
+				itemName: 'access-oop-api',
+				imgHref: 'access'
 			},
 			{
 				itemHref: 'arangodb-oop/index.html',
-				itemName: 'arangodb-oop-api'
+				itemName: 'arangodb-oop-api',
+				imgHref: 'arangodb'
 			},
 			{
 				itemHref: 'db2-oop/index.html',
-				itemName: 'db2-oop-api'
+				itemName: 'db2-oop-api',
+				imgHref: 'db2'
 			},
 			{
 				itemHref: 'elasticsearch-oop/index.html',
-				itemName: 'elasticsearch-oop-api'
+				itemName: 'elasticsearch-oop-api',
+				imgHref: 'elasticsearch'
 			},
 			{
 				itemHref: 'mongodb-oop/index.html',
-				itemName: 'mongodb-oop-api'
+				itemName: 'mongodb-oop-api',
+				imgHref: 'mongodb'
 			},
 			{
 				itemHref: 'mysql-oop/index.html',
-				itemName: 'mysql-oop-api'
+				itemName: 'mysql-oop-api',
+				imgHref: 'mysql'
 			},
 			{
 				itemHref: 'oracle-oop/index.html',
-				itemName: 'oracle-oop-api'
+				itemName: 'oracle-oop-api',
+				imgHref: 'oracle'
 			},
 			{
 				itemHref: 'postgresql-oop/index.html',
-				itemName: 'postgresql-oop-api'
+				itemName: 'postgresql-oop-api',
+				imgHref: 'postgresql'
 			},
 			{
 				itemHref: 'redis-oop/index.html',
-				itemName: 'redis-oop-api'
+				itemName: 'redis-oop-api',
+				imgHref: 'redis'
 			},
 			{
 				itemHref: 'sqlite-oop/index.html',
-				itemName: 'sqlite-oop-api'
+				itemName: 'sqlite-oop-api',
+				imgHref: 'sqlite'
 			},
 			{
 				itemHref: 'sqlserver-oop/index.html',
-				itemName: 'sqlserver-oop-api'
+				itemName: 'sqlserver-oop-api',
+				imgHref: 'sqlserver'
 			},
 			{
 				itemHref: 'xml-oop/index.html',
-				itemName: 'xml-oop-api'
+				itemName: 'xml-oop-api',
+				imgHref: 'xml'
 			}
 		]
 		
@@ -124,7 +136,7 @@
 			html+= '<div class="col-sm-6 col-md-4 col-lg-3">';
 			html+= '<div class="thumbnail">';
 			html+= '<a href="'+itemsArray[i].itemHref+'" target="_blank" title="'+itemsArray[i].itemName+'">';
-			html+= '<img src="static/img/oracle.jpg" width="300" height="150" alt="'+itemsArray[i].itemName+'"/>';
+			html+= '<img src="static/img/'+itemsArray[i].imgHref+'.png" width="300" height="150" alt="'+itemsArray[i].itemName+'"/>';
 			html+= '</a><div class="caption">';
 			html+= '<h3><a href="'+itemsArray[i].itemHref+'" target="_blank" title="'+itemsArray[i].itemName+'">'+itemsArray[i].itemName+'<br>';
 			html+= '<small>api</small></a>';

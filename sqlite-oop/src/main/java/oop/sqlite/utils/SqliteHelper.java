@@ -3,6 +3,7 @@ package oop.sqlite.utils;
 import oop.sqlite.annotation.SqliteTable;
 import oop.sqlite.config.SqliteConfig;
 import oop.sqlite.console.SqliteConsoleBaseEntity;
+import oop.sqlite.constant.SqliteConstant;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -35,8 +36,8 @@ public class SqliteHelper {
      * @param targetClass
      */
     public SqliteHelper(Class<?> targetClass) {
-        this.dbPath = SqliteUtils.isBlank(SqliteConfig.getUri()) ? SqliteConfig.DB_PATH : SqliteConfig.getUri();
-        this.dbType = SqliteConfig.DB_TYPE_DEFAULT;
+        this.dbPath = SqliteUtils.isBlank(SqliteConfig.getUri()) ? SqliteConstant.DB_PATH : SqliteConfig.getUri();
+        this.dbType = SqliteConstant.DB_TYPE_DEFAULT;
         SqliteTable sqliteTable = targetClass.getAnnotation(SqliteTable.class);
         if (null != sqliteTable) {
             this.dbPath = sqliteTable.dbPath();
@@ -53,11 +54,11 @@ public class SqliteHelper {
      */
     public SqliteHelper(String dbPath, boolean absolute) {
         if (SqliteUtils.isBlank(dbPath)) {
-            this.dbPath = SqliteUtils.isBlank(SqliteConfig.getUri()) ? SqliteConfig.DB_PATH : SqliteConfig.getUri();
+            this.dbPath = SqliteUtils.isBlank(SqliteConfig.getUri()) ? SqliteConstant.DB_PATH : SqliteConfig.getUri();
         } else {
             this.dbPath = dbPath;
         }
-        this.dbType = SqliteConfig.DB_TYPE_DEFAULT;
+        this.dbType = SqliteConstant.DB_TYPE_DEFAULT;
         if (!absolute) {
             this.dbPath = SqliteUtils.getClassRootPath(this.dbPath);
         }
@@ -70,9 +71,9 @@ public class SqliteHelper {
      */
     public SqliteHelper(String dbPath) {
         if (SqliteUtils.isBlank(dbPath)) {
-            this.dbPath = SqliteUtils.isBlank(SqliteConfig.getUri()) ? SqliteConfig.DB_PATH : SqliteConfig.getUri();
+            this.dbPath = SqliteUtils.isBlank(SqliteConfig.getUri()) ? SqliteConstant.DB_PATH : SqliteConfig.getUri();
         }
-        this.dbType = SqliteConfig.DB_TYPE_DEFAULT;
+        this.dbType = SqliteConstant.DB_TYPE_DEFAULT;
         // 默认相对路径
         this.dbPath = SqliteUtils.getClassRootPath(this.dbPath);
     }
@@ -158,19 +159,19 @@ public class SqliteHelper {
     private String getDBUrl() {
         StringBuffer currentDbPathSb = new StringBuffer("jdbc:sqlite:/").append(this.dbPath);
         switch (this.dbType) {
-            case SqliteConfig.DB_TYPE_BY_MINUTE:
+            case SqliteConstant.DB_TYPE_BY_MINUTE:
                 currentDbPathSb.append(SqliteUtils.nowFormatStr("yyyyMMddHHmm")).append(".db");
                 break;
-            case SqliteConfig.DB_TYPE_BY_HOUR:
+            case SqliteConstant.DB_TYPE_BY_HOUR:
                 currentDbPathSb.append(SqliteUtils.nowFormatStr("yyyyMMddHH")).append(".db");
                 break;
-            case SqliteConfig.DB_TYPE_BY_DAY:
+            case SqliteConstant.DB_TYPE_BY_DAY:
                 currentDbPathSb.append(SqliteUtils.nowFormatStr("yyyyMMdd")).append(".db");
                 break;
-            case SqliteConfig.DB_TYPE_BY_MOUTH:
+            case SqliteConstant.DB_TYPE_BY_MOUTH:
                 currentDbPathSb.append(SqliteUtils.nowFormatStr("yyyyMM")).append(".db");
                 break;
-            case SqliteConfig.DB_TYPE_BY_YEAR:
+            case SqliteConstant.DB_TYPE_BY_YEAR:
                 currentDbPathSb.append(SqliteUtils.nowFormatStr("yyyy")).append(".db");
                 break;
             default:
@@ -776,7 +777,7 @@ public class SqliteHelper {
     public static void test() {
         Connection connection = null;
         try {
-            String TEST_DB_PATH = SqliteUtils.getClassRootPath(SqliteConfig.TEST_DB_PATH);
+            String TEST_DB_PATH = SqliteUtils.getClassRootPath(SqliteConstant.TEST_DB_PATH);
             // create a database connection
             String connectStr = getDBUrl(TEST_DB_PATH);
             connection = DriverManager.getConnection(connectStr);

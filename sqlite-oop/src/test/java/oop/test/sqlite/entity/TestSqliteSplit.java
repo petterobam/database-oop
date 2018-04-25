@@ -6,6 +6,7 @@ import oop.sqlite.annotation.SqliteID;
 import oop.sqlite.annotation.SqliteTable;
 import oop.sqlite.annotation.SqliteTransient;
 import oop.sqlite.config.SqliteConfig;
+import oop.sqlite.constant.SqliteConstant;
 
 /**
  * 测试分库表对应实体类
@@ -13,7 +14,7 @@ import oop.sqlite.config.SqliteConfig;
  * @author 欧阳洁
  * @create 2017-09-30 9:44
  **/
-@SqliteTable(name = "t_test_splite_sqlite",dbPath = "database/t_test_splite_",dbType = SqliteConfig.DB_TYPE_BY_DAY)
+@SqliteTable(name = "t_test_splite_sqlite",dbPath = "database/t_test_splite_",dbType = SqliteConstant.DB_TYPE_BY_DAY)
 public class TestSqliteSplit extends SqliteBaseEntity {
     /**
      * 主键

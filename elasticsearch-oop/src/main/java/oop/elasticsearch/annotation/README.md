@@ -154,7 +154,7 @@
     * ```classic```：```TF/IDF```算法。请参阅[Lucene的实用评分函数](https://www.elastic.co/guide/en/elasticsearch/guide/master/practical-scoring-function.html)。
     * ```boolean```：一种简单的布尔相似性，在不需要全文排名时使用，分数只应基于查询条件是否匹配而使用。布尔相似度给出了一个等于他们的查询提升的分数。
 
-  - ```store``` ，```true/false``` 通常查询是对编入的索引进行查询，不必从```_source```字段中提取这些字段k可以设置为 ```false```。
+  - ```store``` ，```true/false``` 通常查询是对编入的索引进行查询，不必从```_source```字段中提取这些字段可以设置为 ```false```。
 
   - ```term_vector``` ， 定义术语，用于特定文档搜索
     * ```no```：没有任何术语向量被存储。（默认）

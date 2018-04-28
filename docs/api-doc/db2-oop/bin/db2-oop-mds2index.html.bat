@@ -43,8 +43,16 @@ echo "------------------------------------------------------------"
 :mds2indexhtml
 echo ">>>>>>>>>>>starting convert..."
 echo "#############################################################"
-echo "run java -jar %jar_path% %conf_path% %mds_path% %tpl_path% %out_path% >> db2-oop-mds2index.html.log 2>> db2-oop-mds2index.html-error.log"
-java -jar %jar_path% %conf_path% %mds_path% %tpl_path% %out_path% >> ..\log\db2-oop-mds2index.html.log 2>> ..\log\db2-oop-mds2index.html-error.log
+Set log_base_path=%curr_path:~0,-4%
+set log_path=%log_base_path%log\db2-oop-mds2index.html.log
+set error_log_path=%log_base_path%log\db2-oop-mds2index.html-error.log
+echo "--------------------------"
+echo ">>>>>>>>>>>Log File Path:%log_path%"
+echo "--------------------------"
+echo ">>>>>>>>>>>Error Log File Path:%error_log_path%"
+echo "#############################################################"
+echo "run java -jar %jar_path% %conf_path% %mds_path% %tpl_path% %out_path% >> %log_path% 2>> %error_log_path%"
+java -jar %jar_path% %conf_path% %mds_path% %tpl_path% %out_path% >> %log_path% 2>> %error_log_path%
 echo "#############################################################"
 echo ">>>>>>>>>>>convert over!!"
 echo "------------------------------------------------------------"

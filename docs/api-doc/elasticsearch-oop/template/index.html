@@ -32,6 +32,7 @@
             margin: 0;
             padding: 1.2em 0;
             text-align: center;
+            line-height: normal;
         }
 
         nav {
@@ -54,6 +55,14 @@
             padding: 0 10px;
         }
 
+        nav .small-title{
+          color: #313354;
+          font-size: 10pt;
+          font-weight: bold;
+          padding: 8px;
+          display: inline;
+        }
+
         nav .button {
             background: #777;
             border: 1px solid #333;
@@ -62,6 +71,18 @@
             font-weight: bold;
             padding: 8px;
             border-radius: 4px;
+            cursor: pointer;
+        }
+
+        nav .button_active{
+            border: 1px solid #333;
+            font-size: 10pt;
+            font-weight: bold;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #E8D86A;
+            color: #7879DA;
         }
 
         nav ul {
@@ -71,10 +92,21 @@
         nav ul a {
             color: #333;
             text-decoration: none;
+            display: inline;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+        nav ul a a{
+            padding-left: 0px;
+            padding-right: 0px;
         }
 
         nav ul a:hover {
             text-decoration: underline;
+        }
+
+        nav ul a:visited{
+            background-color: #DADEFA;
         }
 
         nav li {
@@ -194,8 +226,11 @@
             }
 
             nav {
-                position: absolute;
+                position: fixed;
+                top: 0;
+                overflow-y: hidden;
                 width: 100%;
+                height: 48px;
             }
 
             nav .menubar {
@@ -208,10 +243,19 @@
 
             nav ul {
                 background: #fff;
-                display: none;
                 font-size: 14pt;
                 margin: 0;
                 padding: 0 0 0 8px;
+            }
+
+            nav #java-nav-directory,#js-nav-directory{
+                display: none;
+                height: 90%;
+                overflow-y: auto;
+            }
+
+            nav ul a:active{
+                color: #ABCDEF;
             }
 
             nav .level2 {
@@ -249,13 +293,13 @@
 </header>
 <nav>
     <div class="menubar">
-        <a class="button">&#9776;&nbsp;目录索引</a>
+        <a class="button" id="mediaMenubar">&#9776;&nbsp;目录索引</a><span class="small-title">##page.title##</span>
     </div>
     <div id="java-nav-directory">##page.nav##</div>
     <div id="js-nav-directory"></div>
 </nav>
 <article id="article-content">
-    ##page.article##
+##page.article##
 </article>
 <footer>
     <p>© ##page.inc##, Inc.</p>
@@ -271,11 +315,10 @@
         a.async = 1;
         a.src = g;
         m.parentNode.insertBefore(a, m)
-    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+    })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
 
     ga('create', 'UA-48219044-1', 'auto');
     ga('send', 'pageview');
-
 </script>
 <script>
     /*备用文章目录动态生成*/
@@ -366,10 +409,41 @@
             };
         createPostDirectory(document.getElementById('article-content'), document.getElementById('js-nav-directory'), true);
     };
-    var javaDirEle = document.getElementById('java-nav-directory');
-    if (null != javaDirEle && javaDirEle.innerHTML == "") {
+    /*初始化加载js-dir*/
+    var dirEle = document.getElementById('java-nav-directory');
+    if (null != dirEle && dirEle.innerHTML == "") {
         articleDirectoryBuild();
+        var dirEle = document.getElementById('js-nav-directory');
+    }
+    /*移动端目录事件定义*/
+    var mediaMenubar = document.getElementById("mediaMenubar");
+    if(null != mediaMenubar){
+        var dirLinkEvent = false;
+        mediaMenubar.onclick = function(){
+            var style = window.getComputedStyle(dirEle);
+            if(style.display == "none"){
+                this.className = "button_active";
+                dirEle.style.display = "block";
+                document.getElementsByTagName("nav")[0].style.height = "auto";
+            }else {
+                this.className = "button";
+                dirEle.style.display = "none";
+                document.getElementsByTagName("nav")[0].style.height = "48px";
+            }
+            dirLinkEvent = true;
+        };
+    }
+    var aLink = dirEle.getElementsByTagName("a");
+    for(i = 0;i < aLink.length;i++){
+        aLink[i].onclick = function(){
+            this.style.background = "#DADEFA";
+            if(dirLinkEvent){
+                dirEle.style.display = "none";
+                document.getElementsByTagName("nav")[0].style.height = "48px";
+            }
+        };
     }
 </script>
 </body>
 </html>
+                                       

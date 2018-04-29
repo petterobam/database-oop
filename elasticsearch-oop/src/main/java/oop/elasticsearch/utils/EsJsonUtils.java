@@ -97,23 +97,6 @@ public class EsJsonUtils {
     }
 
     /**
-     * Json转List<Map>
-     * @param jsonString json字符串
-     * @return
-     * @Description： json字符串转换成list<Map>
-     */
-    public static List<Map<String, Object>> listKeyMaps(String jsonString) {
-        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-        try {
-            list = JSON.parseObject(jsonString, new TypeReference<List<Map<String, Object>>>() {});
-        } catch (Exception e) {
-            System.out.println("json字符串转map失败");
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    /**
      * 转List<T>对象
      * @param json
      * @param listKey
@@ -140,6 +123,23 @@ public class EsJsonUtils {
             return list;
         }
         return null;
+    }
+
+    /**
+     * Json转List<Map>
+     * @param jsonString json字符串
+     * @return
+     * @Description： json字符串转换成list<Map>
+     */
+    public static List<Map<String, Object>> listKeyMaps(String jsonString) {
+        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+        try {
+            list = JSON.parseObject(jsonString, new TypeReference<List<Map<String, Object>>>() {});
+        } catch (Exception e) {
+            System.out.println("json字符串转map失败");
+            e.printStackTrace();
+        }
+        return list;
     }
 
     /**

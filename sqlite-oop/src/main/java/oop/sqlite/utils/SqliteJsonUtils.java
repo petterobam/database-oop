@@ -16,6 +16,25 @@ import java.util.Map;
  */
 public class SqliteJsonUtils {
     /**
+     * 对象转字符串
+     * @param object
+     * @param prettyFormat 是否美化Json字符串
+     * @return
+     */
+    public static final String toJSONString(Object object, boolean prettyFormat) {
+        return JSON.toJSONString(object, prettyFormat);
+    }
+
+    /**
+     * 对象转字符串
+     * @param object
+     * @return
+     */
+    public static final String toJSONString(Object object) {
+        return JSON.toJSONString(object, false);
+    }
+
+    /**
      * @param <T>
      * @param json
      * @param clazz
@@ -32,11 +51,29 @@ public class SqliteJsonUtils {
         return t;
     }
 
-    public static final String toJSONString(Object object, boolean prettyFormat) {
-        return JSON.toJSONString(object, prettyFormat);
-    }
-    public static final String toJSONString(Object object) {
-        return JSON.toJSONString(object, false);
+    /**
+     * @param <T>
+     * @param json
+     * @param objKey
+     * @param clazz
+     * @return -> T
+     */
+    public static final <T> T getObject(String json, String objKey, Class<T> clazz) {
+        JSONObject jsonobj = JSON.parseObject(json);
+        if (jsonobj == null) {
+            return null;
+        }
+        Object obj = jsonobj.get(objKey);
+        if (obj == null) {
+            return null;
+        }
+        if (obj instanceof JSONObject) {
+            return jsonobj.getObject(objKey, clazz);
+        } else {
+            System.out.println("json字符串格式不对！");
+        }
+
+        return null;
     }
 
     /**
@@ -54,6 +91,33 @@ public class SqliteJsonUtils {
             e.printStackTrace();
         }
         return list;
+    }
+
+    /**
+     * @param json
+     * @param listKey
+     * @param clazz
+     * @param <T>
+     * @return
+     */
+    public static final <T> List<T> getList(String json, String listKey, Class<T> clazz) {
+        JSONObject jsonobj = JSON.parseObject(json);
+        if (jsonobj == null) {
+            return null;
+        }
+        Object obj = jsonobj.get(listKey);
+        if (obj == null) {
+            return null;
+        }
+        if (obj instanceof JSONArray) {
+            JSONArray jsonarr = (JSONArray) obj;
+            List<T> list = new ArrayList<T>();
+            for (int i = 0; i < jsonarr.size(); i++) {
+                list.add(jsonarr.getObject(i, clazz));
+            }
+            return list;
+        }
+        return null;
     }
 
     /**
@@ -84,62 +148,6 @@ public class SqliteJsonUtils {
             System.out.println("json字符串转换失败！" + jsonStr);
             e.printStackTrace();
         }
-        return null;
-    }
-
-    /**
-     * @param json
-     * @param listKey
-     * @param clazz
-     * @param <T>
-     * @return
-     */
-    public static final <T> List<T> getList(String json, String listKey,
-                                            Class<T> clazz) {
-        JSONObject jsonobj = JSON.parseObject(json);
-        if (jsonobj == null) {
-            return null;
-        }
-        Object obj = jsonobj.get(listKey);
-        if (obj == null) {
-            return null;
-        }
-        if (obj instanceof JSONArray) {
-            JSONArray jsonarr = (JSONArray) obj;
-            List<T> list = new ArrayList<T>();
-            for (int i = 0; i < jsonarr.size(); i++) {
-                list.add(jsonarr.getObject(i, clazz));
-            }
-            return list;
-        }
-        return null;
-    }
-
-    /**
-     * @param <T>
-     * @param json
-     * @param objKey
-     * @param clazz
-     * @return -> T
-     */
-    public static final <T> T getObject(String json, String objKey,
-                                        Class<T> clazz) {
-        JSONObject jsonobj = JSON.parseObject(json);
-        if (jsonobj == null) {
-            return null;
-        }
-
-        Object obj = jsonobj.get(objKey);
-        if (obj == null) {
-            return null;
-        }
-
-        if (obj instanceof JSONObject) {
-            return jsonobj.getObject(objKey, clazz);
-        } else {
-            System.out.println("json字符串格式不对！");
-        }
-
         return null;
     }
 }

@@ -285,7 +285,7 @@ public class SqliteSqlHelper<T extends SqliteBaseEntity> {
 
             }
             String sql = SqliteUtils.replace(sqliteSql.sql(), "this.tableName", this.getTableName());
-            //TODO 此处可以读取自定义SQL的辅助注解，像上面提到的SqliteSqlWhereIf注解，实现动态SQL
+            //待处理：此处可以读取自定义SQL的辅助注解，像上面提到的SqliteSqlWhereIf注解，实现动态SQL
             target.setCurrentSql(sql);
             target.setCurrentParam(param);
         }
@@ -317,7 +317,7 @@ public class SqliteSqlHelper<T extends SqliteBaseEntity> {
         }
         SqliteSql sqliteSql = method.getAnnotation(SqliteSql.class);
         String sql = SqliteUtils.replace(sqliteSql.sql(), "this.tableName", this.getTableName());
-        //TODO 此处可以读取自定义SQL的辅助注解，像上面提到的SqliteSqlWhereIf注解，实现动态SQL
+        //待处理：此处可以读取自定义SQL的辅助注解，像上面提到的SqliteSqlWhereIf注解，实现动态SQL
         return sql;
     }
 

@@ -72,5 +72,4 @@ public class SqliteTest {
         int count = sqliteService.count(query);
         System.out.println(count);
     }
-    //TODO 测试自定义注解，测试数据库函数和过程
 }

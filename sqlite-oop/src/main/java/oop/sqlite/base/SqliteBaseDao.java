@@ -49,49 +49,6 @@ public abstract class SqliteBaseDao<T extends SqliteBaseEntity> {
     }
 
     /**
-     * 修改
-     *
-     * @param sql
-     * @return
-     */
-    public int update(String sql) {
-        return this.sqliteHelper.update(sql);
-    }
-
-    /**
-     * 删除
-     *
-     * @param sql
-     * @return
-     */
-    public int delete(String sql) {
-        return this.sqliteHelper.delete(sql);
-    }
-
-    /**
-     * 非查询语句执行，返回List<T>
-     *
-     * @param sql
-     * @return
-     */
-    public List<T> query(String sql) {
-        String jsonStr = this.sqliteHelper.queryJsonResult(sql, this.getColumMap());
-        if (jsonStr == null) return null;
-        List<T> result = SqliteUtils.getInstance(jsonStr, this.entityClazz);
-        return result;
-    }
-
-    /**
-     * 查询条数
-     * @param sql
-     * @return
-     */
-    public int count(String sql) {
-        return sqliteHelper.queryCountResult(sql);
-    }
-
-
-    /**
      * 插入
      *
      * @param entity
@@ -109,12 +66,32 @@ public abstract class SqliteBaseDao<T extends SqliteBaseEntity> {
     /**
      * 修改
      *
+     * @param sql
+     * @return
+     */
+    public int update(String sql) {
+        return this.sqliteHelper.update(sql);
+    }
+
+    /**
+     * 修改
+     *
      * @param entity
      * @return
      */
     public int update(T entity) {
         this.sqlHelper.createUpdate(entity);
         return this.sqliteHelper.update(entity.getCurrentSql(), entity.getCurrentParam());
+    }
+
+    /**
+     * 删除
+     *
+     * @param sql
+     * @return
+     */
+    public int delete(String sql) {
+        return this.sqliteHelper.delete(sql);
     }
 
     /**
@@ -129,6 +106,16 @@ public abstract class SqliteBaseDao<T extends SqliteBaseEntity> {
     }
 
     /**
+     * 删除
+     *
+     * @param id
+     * @return
+     */
+    public int deleteById(Object id) {
+        return this.deleteById(id,null);
+    }
+
+    /**
      * 删除，分表字段值
      *
      * @param id
@@ -140,14 +127,18 @@ public abstract class SqliteBaseDao<T extends SqliteBaseEntity> {
         param.add(id);
         return this.sqliteHelper.delete(sql, param);
     }
+
     /**
-     * 删除
+     * 非查询语句执行，返回List<T>
      *
-     * @param id
+     * @param sql
      * @return
      */
-    public int deleteById(Object id) {
-        return this.deleteById(id,null);
+    public List<T> query(String sql) {
+        String jsonStr = this.sqliteHelper.queryJsonResult(sql, this.getColumMap());
+        if (jsonStr == null) return null;
+        List<T> result = SqliteUtils.getInstance(jsonStr, this.entityClazz);
+        return result;
     }
 
     /**
@@ -162,16 +153,6 @@ public abstract class SqliteBaseDao<T extends SqliteBaseEntity> {
         if (jsonStr == null) return null;
         List<T> result = SqliteUtils.getInstance(jsonStr, entity.getClass());
         return result;
-    }
-    /**
-     * 查询条数语句执行，返回List<T>
-     *
-     * @param entity
-     * @return
-     */
-    public int count(T entity) {
-        this.sqlHelper.createCount(entity);
-        return this.sqliteHelper.queryCountResult(entity.getCurrentSql(), entity.getCurrentParam());
     }
 
     /**
@@ -203,6 +184,28 @@ public abstract class SqliteBaseDao<T extends SqliteBaseEntity> {
             return null;
         }
     }
+
+    /**
+     * 查询条数
+     * @param sql
+     * @return
+     */
+    public int count(String sql) {
+        return sqliteHelper.queryCountResult(sql);
+    }
+
+    /**
+     * 查询条数语句执行，返回List<T>
+     *
+     * @param entity
+     * @return
+     */
+    public int count(T entity) {
+        this.sqlHelper.createCount(entity);
+        return this.sqliteHelper.queryCountResult(entity.getCurrentSql(), entity.getCurrentParam());
+    }
+
+
 
     /**
      * 通过自定义注解执行查询的语句

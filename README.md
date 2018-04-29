@@ -1,3 +1,4 @@
+[![Waffle.io - Columns and their card count](https://badge.waffle.io/petterobam/database-oop.png?columns=all)](https://waffle.io/petterobam/database-oop?utm_source=badge)
 [![Build Status](https://travis-ci.org/petterobam/database-oop.svg?branch=master)](https://travis-ci.org/petterobam/database-oop)
 [![Coverage Status](https://coveralls.io/repos/github/petterobam/database-oop/badge.svg?branch=master)](https://coveralls.io/github/petterobam/database-oop?branch=master)
 [![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=103)](https://opensource.org/licenses/mit-license.php)

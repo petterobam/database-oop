@@ -225,40 +225,6 @@ public class SqliteUtils {
     }
 
     /**
-     * <一句话功能简述>
-     * <功能详细描述>
-     *
-     * @param jsonString json字符串
-     * @param clazz      对象class，如果要转化为List<ObjectA> 传入ObjectA.class
-     * @return Object [返回类型说明]
-     * @throws throws [违例类型] [违例说明]
-     * @see [类、类#方法、类#成员]T
-     */
-    public static <T> T getInstance(String jsonString, Class clazz) {
-        if (SqliteUtils.isBlank(jsonString)) return null;
-        if ("[]".equals(SqliteUtils.trim(jsonString))) return null;
-        Object obj = JSON.parse(jsonString);
-        if (obj == null) {
-            return null;
-        }
-        if (obj instanceof JSONArray) {
-            JSONArray jsonarr = (JSONArray) obj;
-            List list = new ArrayList();
-            //如果集合不为null则是返回成功,则需要修改数据的时间
-            //创建转换json的需要转换的集合类型   [{},{}]
-            for (int i = 0; i < jsonarr.size(); i++) {
-                list.add(jsonarr.getObject(i, clazz));
-            }
-            return (T)list;
-        }else if(obj instanceof JSONObject){
-            JSONObject jsonObject = (JSONObject) obj;
-            return (T)jsonObject.toJavaObject(clazz);
-        }else {
-            return null;
-        }
-    }
-
-    /**
      * Object转化为json字符串
      * <功能详细描述>
      *
@@ -357,6 +323,39 @@ public class SqliteUtils {
             e.printStackTrace();
         }
         return result;
+    }
+
+    /**
+     * <一句话功能简述>
+     * <功能详细描述>
+     *
+     * @param jsonString json字符串
+     * @param clazz 对象class，如果要转化为List<ObjectA> 传入ObjectA.class
+     * @return Object [返回类型说明]
+     * @see [类、类#方法、类#成员]T
+     */
+    public static <T> T getInstance(String jsonString, Class clazz) {
+        if (SqliteUtils.isBlank(jsonString)) return null;
+        if ("[]".equals(SqliteUtils.trim(jsonString))) return null;
+        Object obj = JSON.parse(jsonString);
+        if (obj == null) {
+            return null;
+        }
+        if (obj instanceof JSONArray) {
+            JSONArray jsonarr = (JSONArray) obj;
+            List list = new ArrayList();
+            //如果集合不为null则是返回成功,则需要修改数据的时间
+            //创建转换json的需要转换的集合类型   [{},{}]
+            for (int i = 0; i < jsonarr.size(); i++) {
+                list.add(jsonarr.getObject(i, clazz));
+            }
+            return (T)list;
+        }else if(obj instanceof JSONObject){
+            JSONObject jsonObject = (JSONObject) obj;
+            return (T)jsonObject.toJavaObject(clazz);
+        }else {
+            return null;
+        }
     }
 }
 

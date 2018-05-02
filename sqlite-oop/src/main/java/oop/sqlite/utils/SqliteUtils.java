@@ -357,6 +357,40 @@ public class SqliteUtils {
             return null;
         }
     }
+
+    /**
+     * 字符转数字
+     * @param intStr
+     * @return
+     */
+    public static int parseInt(String intStr){
+        return parseInt(intStr,0);
+    }
+    /**
+     * 字符转数字
+     * @param intStr
+     * @param defaultValue
+     * @return
+     */
+    public static int parseInt(String intStr,int defaultValue){
+        if(isBlank(intStr)){
+            return defaultValue;
+        }else {
+            try {
+                return Integer.parseInt(intStr);
+            }catch (Exception e){
+                return defaultValue;
+            }
+        }
+    }
+
+    /**
+     * 获取当前时间戳
+     * @return
+     */
+    public static long getNowStamp(){
+        return new Date().getTime();
+    }
 }
 
 

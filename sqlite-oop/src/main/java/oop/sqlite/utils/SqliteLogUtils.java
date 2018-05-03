@@ -32,6 +32,19 @@ public class SqliteLogUtils {
         System.out.println(info.toString());
     }
     /**
+     * error日志打印
+     * @param messagePattern
+     * @param argArray
+     */
+    public static final void warn(String messagePattern, Object... argArray) {
+        StringBuffer info = new StringBuffer("[sqlite-oop]-[warn]");
+        info.append("-[").append(new Date()).append("]");
+        // 待处理： 代理获取调用类的类名信息、方法名信息等等
+        info.append("-[").append(print(messagePattern,argArray)).append("]");
+        // 待处理： 这些info信息可以转储到其他地方，形成服务日志
+        System.out.println(info.toString());
+    }
+    /**
      * debug日志打印
      * @param messagePattern
      * @param argArray
@@ -158,7 +171,7 @@ public class SqliteLogUtils {
             String oAsString = o.toString();
             sbuf.append(oAsString);
         } catch (Throwable var3) {
-            System.out.println("EsLogUtils: Failed toString() invocation on an object of type [" + o.getClass().getName() + "]");
+            System.out.println("SqliteLogUtils: Failed toString() invocation on an object of type [" + o.getClass().getName() + "]");
             sbuf.append("[FAILED toString()]");
         }
 

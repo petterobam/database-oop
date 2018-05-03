@@ -1,9 +1,14 @@
 package oop.sqlite.connection;
 
+import oop.sqlite.config.SqliteConfig;
+import oop.sqlite.thread.SqliteThreadUtils;
 import oop.sqlite.utils.SqliteLogUtils;
 import oop.sqlite.utils.SqliteUtils;
 
-import java.sql.SQLException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 池回收线程
@@ -11,25 +16,128 @@ import java.sql.SQLException;
  * @author 欧阳洁
  * @since 2018-05-02 13:41
  */
-public class SqliteConnectionPool extends SqliteBaseConnectionFactory implements Runnable {
-    public void run() {
-        while (true) {
-            try {
-                Thread.sleep(1000);
-                //SqliteLogUtils.error("INFO:[可用链接数:", sList.size(), "]", "[已用连接数:", sRunList.size(), "]");
-                for (SqliteBaseConnection con : sRunList) {
-                    if(null == con || null == con.getConnection() || con.getConnection().isClosed() || SqliteUtils.getNowStamp() - con.getCreateTime() > CON_TIMEOUT){
-                        sRunList.remove(con);
+public class SqliteConnectionPool extends SqliteBaseConnectionFactory {
+    private static int SLEEP = SqliteUtils.parseInt(SqliteConfig.getValue("sqlite.pool.thred.sleep"), 1000);// 线程每次SLEEP时长
+    public static boolean CHECK_RUN_ACTIVE = false;// 检查 ClearRunConnectionThread 线程是否在
+    public static boolean CHECK_IDLE_ACTIVE = false;// 检查 RefreshIdleConnectionThread 线程是否在
+    public static boolean CHECK_MONITOR_ACTIVE = false;// 检查 MonitorConnectionPoolThread 线程是否在
+
+    /**
+     * LINK 线程池
+     */
+    private static final ExecutorService CONNECTION_POOL_EXETHREAD = new ThreadPoolExecutor(3, 10,
+            0L, TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<Runnable>(2000),
+            SqliteThreadUtils.buildJobFactory("Sqlite 连接池 监控系统 线程池"), new ThreadPoolExecutor.AbortPolicy());
+
+    /**
+     * 获取用于Sqlite连接池监控用的线程池服务
+     *
+     * @return
+     */
+    public static ExecutorService getExethread() {
+        return CONNECTION_POOL_EXETHREAD;
+    }
+
+    /**
+     * 开启连接池的线程检查，一次性
+     */
+    public static void checkTreadActiveStatus(){
+        SqliteConnectionPool.CHECK_RUN_ACTIVE = true;
+        SqliteConnectionPool.CHECK_IDLE_ACTIVE = true;
+        SqliteConnectionPool.CHECK_MONITOR_ACTIVE = true;
+    }
+
+    /**
+     * 初始化连接池线程
+     */
+    public static void initConnectPoolThreads(){
+        // 添加 池监控并适时生产新连接对象的 线程
+        SqliteConnectionPool.addMonitorConnectionPoolThread();
+        // 添加 池回收无效或久置超时的连接对象的 线程
+        SqliteConnectionPool.addClearRunConnectionThread();
+        // 添加 池检查刷新闲置连接对象的 线程
+        SqliteConnectionPool.addRefreshIdleConnectionThread();
+    }
+
+    /**
+     * 监控连接池中已分配的连接对象，定时收取没用的连接对象
+     */
+    public static void addClearRunConnectionThread() {
+        CONNECTION_POOL_EXETHREAD.execute(new Runnable() {
+            public void run() {
+                while (true) {
+                    try {
+                        if(SqliteConnectionPool.CHECK_RUN_ACTIVE){
+                            SqliteLogUtils.info("池回收无效或久置超时的连接对象的 线程运行中...");
+                            SqliteConnectionPool.CHECK_RUN_ACTIVE = false;
+                        }
+                        SqliteThreadUtils.sleep(SLEEP);
+                        checkAllRunningConnection();
+                    } catch (InterruptedException e) {
+                        idleConList.clear();
+                        runConList.clear();
+                        addClearRunConnectionThread();
+                        SqliteLogUtils.error("ERROR:[池回收无效或久置超时的连接对象的 线程死掉,重新添加新线程！]", e);
+                        e.printStackTrace();
+                        break;
                     }
                 }
-            } catch (InterruptedException e) {
-                sList.clear();
-                sRunList.clear();
-                SqliteLogUtils.error("ERROR:[池回收线程死掉]");
-                e.printStackTrace();
-            } catch (SQLException e) {
-                e.printStackTrace();
             }
-        }
+        });
+    }
+
+    /**
+     * 监控连接池中闲置的连接对象，定时收取没用的连接对象
+     */
+    public static void addRefreshIdleConnectionThread() {
+        CONNECTION_POOL_EXETHREAD.execute(new Runnable() {
+            public void run() {
+                while (true) {
+                    try {
+                        if(SqliteConnectionPool.CHECK_MONITOR_ACTIVE){
+                            SqliteLogUtils.info("池检查刷新闲置连接对象的 线程运行中...");
+                            SqliteConnectionPool.CHECK_MONITOR_ACTIVE = false;
+                        }
+                        SqliteThreadUtils.sleep(SLEEP);
+                        checkAllIdleConnection();
+                    } catch (InterruptedException e) {
+                        idleConList.clear();
+                        runConList.clear();
+                        addRefreshIdleConnectionThread();
+                        SqliteLogUtils.error("ERROR:[池检查刷新闲置连接对象的 线程死掉,重新添加新线程！]", e);
+                        e.printStackTrace();
+                        break;
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * 监控连接池中闲置的连接对象，定时收取没用的连接对象
+     */
+    public static void addMonitorConnectionPoolThread() {
+        CONNECTION_POOL_EXETHREAD.execute(new Runnable() {
+            public void run() {
+                while (true) {
+                    try {
+                        if(SqliteConnectionPool.CHECK_IDLE_ACTIVE){
+                            SqliteLogUtils.info("池监控并适时生产新连接对象的 线程运行中...");
+                            SqliteConnectionPool.CHECK_IDLE_ACTIVE = false;
+                        }
+                        SqliteThreadUtils.sleep(SLEEP);
+                        checkConnectionBox(null);
+                    } catch (InterruptedException e) {
+                        idleConList.clear();
+                        runConList.clear();
+                        addMonitorConnectionPoolThread();
+                        SqliteLogUtils.error("ERROR:[池监控并适时生产新连接对象的 线程死掉,重新添加新线程！]", e);
+                        e.printStackTrace();
+                        break;
+                    }
+                }
+            }
+        });
     }
 }

@@ -1,14 +1,12 @@
 package oop.sqlite.connection;
 
 import oop.sqlite.config.SqliteConfig;
-import oop.sqlite.exception.SqliteConnectionMaxException;
 import oop.sqlite.utils.SqliteLogUtils;
 import oop.sqlite.utils.SqliteUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Vector;
 
 /**
@@ -20,16 +18,20 @@ import java.util.Vector;
 public class SqliteBaseConnectionFactory {
     private static String DEFAULT_DB_PATH = SqliteConfig.getUri();//默认库
     private static int CON_MAX = SqliteUtils.parseInt(SqliteConfig.getValue("sqlite.connection.max"), 2);// 最大池链接
-    private static int CON_MIN = Integer.parseInt(SqliteConfig.getValue("sqlite.connection.min"), 1);// 初始池链接
-    private static int CON_STEP = Integer.parseInt(SqliteConfig.getValue("sqlite.connection.step"), 1);// 每次最大补充线程数量
-    protected static long CON_TIMEOUT = Integer.parseInt(SqliteConfig.getValue("sqlite.connection.timeout"),500000);// 超时线程回收
-    protected static Vector<SqliteBaseConnection> sList = new Vector<SqliteBaseConnection>();// 链接容器
-    protected static Vector<SqliteBaseConnection> sRunList = new Vector<SqliteBaseConnection>();// 已分配的链接容器
-    private static boolean REFRESH_CON = false;
+    private static int CON_MIN = SqliteUtils.parseInt(SqliteConfig.getValue("sqlite.connection.min"), 1);// 初始池链接
+    private static int CON_STEP = SqliteUtils.parseInt(SqliteConfig.getValue("sqlite.connection.step"), 1);// 每次最大补充线程数量
+    private static boolean REFRESH_CON_POOL = false;
+    private static boolean USE_CONNECT_POOL = Boolean.parseBoolean(SqliteConfig.getValue("sqlite.connection.pool"));
+    protected static long CON_TIMEOUT = SqliteUtils.parseInt(SqliteConfig.getValue("sqlite.connection.timeout"), 500000);// 超时线程回收
+    protected static Vector<SqliteBaseConnection> idleConList = new Vector<SqliteBaseConnection>();// 闲置连接
+    protected static Vector<SqliteBaseConnection> runConList = new Vector<SqliteBaseConnection>();// 已分配的连接
 
     static {
         init();
-        new Thread(new SqliteConnectionPool()).start();
+        // 是否启用线程池
+        if(USE_CONNECT_POOL){
+            SqliteConnectionPool.initConnectPoolThreads();
+        }
     }
 
     /**
@@ -38,36 +40,28 @@ public class SqliteBaseConnectionFactory {
      * @throws SQLException
      */
     private static void init() {
-        Connection con = null;
-        Statement stmt = null;
         try {
-            loadClass();
-            addConnection(DEFAULT_DB_PATH,CON_MIN);
+            if(Boolean.parseBoolean(SqliteConfig.getValue("sqlite.path.classpath"))){
+                DEFAULT_DB_PATH = SqliteUtils.getClassRootPath(DEFAULT_DB_PATH);
+            }
+            loadSqliteJdbcClass();//加载 org.sqlite.JDBC
+            addConnection(DEFAULT_DB_PATH, CON_MIN);//默认预先建立一些连接到链接对象
         } catch (Exception e) {
-            sList.clear();
+            idleConList.clear();
             SqliteLogUtils.error("ERROR:[池初始化失败][池容器已清空]");
             e.printStackTrace();
-        } finally {
-            try {
-                if (con != null)
-                    con.close();
-                if (stmt != null)
-                    stmt.close();
-            } catch (SQLException e) {
-                SqliteLogUtils.error("ERROR:[池初始化失败][池容器已清空]");
-                sList.clear();
-                e.printStackTrace();
-            }
         }
     }
 
     /**
+     * 加载 org.sqlite.JDBC
+     *
      * @return 返回结果
      * @author 欧阳洁
      * @date 2018/5/2
      * @description
      */
-    private static void loadClass() throws ClassNotFoundException {
+    private static void loadSqliteJdbcClass() throws ClassNotFoundException {
         Class.forName("org.sqlite.JDBC");
     }
 
@@ -77,75 +71,141 @@ public class SqliteBaseConnectionFactory {
      * @return
      * @throws Exception
      * @throws SQLException
-     * @throws SqliteConnectionMaxException
      */
-    public Connection getConnection(String dbPath) throws SQLException, SqliteConnectionMaxException, SqliteConnectionMaxException {
+    public static Connection getConnection(String dbPath) throws SQLException {
         // 先进先出原则
-        SqliteBaseConnection sPojo = null;
-        checkConnection(dbPath);
-        synchronized (sList) {
-            checkList();
-            sPojo = sList.get(0);
-            sList.remove(0);
-            sRunList.add(sPojo);
+        SqliteBaseConnection currCon = null;
+        synchronized (idleConList) {
+            // 当可用连接池不为空时候
+            if (SqliteUtils.isNotEmpty(idleConList)) {
+                currCon = idleConList.get(0);
+                idleConList.remove(0);
+                addRunningConnection(currCon);
+            }
+            if (currCon == null || currCon.getConnection() == null || currCon.getConnection().isClosed()) {
+                currCon = createBaseConnection(dbPath);
+                addRunningConnection(currCon);
+            }
         }
-        if (sPojo == null || sPojo.getConnection().isClosed()) {
-            throw new SqliteConnectionMaxException(CON_MAX);
+        return currCon.getConnection();
+    }
+
+    /**
+     * 添加已分配的连接到已分配队列
+     *
+     * @param running
+     * @return
+     */
+    private static boolean addRunningConnection(SqliteBaseConnection running) {
+        if (runConList.size() < CON_MAX) {
+            runConList.add(running);
+            return true;
         }
-        return sPojo.getConnection();
+        SqliteLogUtils.warn("当前连接数量大于自定义的最大连接数量！");
+        return false;
     }
 
     /**
      * 检查容器是否满足使用需求
-     *
-     * @throws SqliteConnectionMaxException
-     * @throws SQLException
-     * @author Allen
-     * @date 2016年10月31日
+     * @return
      */
-    private void checkList() throws SqliteConnectionMaxException, SQLException {
-        if (sList.size() == 0) {
+    protected static boolean checkConnectionBox(String dbPath){
+        // 如果连接池里闲置的连接没有
+        int addNum = 0;
+        if (idleConList.size() == 0) {
             // 超过最大线程数
-            int num = 0;
-            if ((num = CON_MAX - sRunList.size() - sList.size()) <= 0) {
-                throw new SqliteConnectionMaxException();
+            addNum = CON_MAX - runConList.size();
+            if (addNum <= 0) {
+                SqliteLogUtils.warn("当前使用的连接数量大于自定义的最大连接[{}]限制！", CON_MAX);
+                return false;
             }
-            // 剩余可增加线程数
-            num = num > CON_STEP ? CON_STEP : num;
-            addConnection(DEFAULT_DB_PATH,num);
+        } else if (idleConList.size() < CON_MIN) {
+            addNum = CON_MAX - idleConList.size() - runConList.size();
+            if (addNum <= 0) {
+                SqliteLogUtils.warn("连接池中当前使用的连接数量太多，闲置连接数量小于自定义的最小[{}]闲置连接！", CON_MIN);
+                return false;
+            }
         }
+        // 剩余可增加连接对象数，默认每次最多增加 CON_STEP 个
+        addNum = addNum > CON_STEP ? CON_STEP : addNum;
+        if (SqliteUtils.isBlank(dbPath)) {
+            addConnection(DEFAULT_DB_PATH, addNum);
+        } else {
+            addConnection(dbPath, addNum);
+        }
+        return true;
     }
 
     /**
-     * @param dbPath
-     * @return 返回结果
+     * 检查闲置连接
+     * @return 检查到并重置的无效闲置连接数量
      * @author 欧阳洁
-     * @date 2018/5/2
-     * @description
      */
-    private synchronized static void checkConnection(String dbPath) {
+    protected synchronized static int checkAllIdleConnection() {
+        int idleRefreshCount = 0;
+        SqliteLogUtils.info("INFO:[可用链接数:{}]，[已用连接数:{}]",idleConList.size(),runConList.size());
         try {
-            if(REFRESH_CON) {
-                for (SqliteBaseConnection con : sList) {
-                    con.setConnection(createConnection(dbPath));
+            if (REFRESH_CON_POOL) {//是否刷新闲置连接池里面的连接
+                for (SqliteBaseConnection con : idleConList) {
+                    if (null == con.getConnection() || con.getConnection().isClosed()) {
+                        con.refreshConnection();
+                        idleRefreshCount++;
+                    }
                 }
-                REFRESH_CON = false;
+                REFRESH_CON_POOL = false;
             }
         } catch (Exception e) {
             SqliteLogUtils.error("ERROR:[新日期检查更新失败][池容器已清空]");
             e.printStackTrace();
         }
+        SqliteLogUtils.info("检测到闲置连接池中无效连接并重置的数量：{}",idleRefreshCount);
+        return idleRefreshCount;
+    }
+
+    /**
+     * 检查已分配的连接
+     * @return 清除已分配使用中的无效连接数量
+     * @author 欧阳洁
+     */
+    protected synchronized static int checkAllRunningConnection() {
+        int runningRemoveCount = 0;
+        SqliteLogUtils.info("INFO:[可用链接数:{}]，[已用连接数:{}]",idleConList.size(),runConList.size());
+        SqliteBaseConnection con = null;
+        for (int i = 0; i < runConList.size(); i++) {
+            con = runConList.get(i);
+            try {
+                if(null == con.getConnection() || con.getConnection().isClosed() || SqliteUtils.getNowStamp() - con.getCreateTime() > CON_TIMEOUT){
+                    runConList.remove(i--);
+                    runningRemoveCount++;
+                }
+            } catch (SQLException e) {
+                SqliteLogUtils.error("检查已分配的连接出现异常！",e);
+                e.printStackTrace();
+            }
+        }
+        SqliteLogUtils.info("定时清除已分配的废弃或超时连接，清除数量：{}",runningRemoveCount);
+        return runningRemoveCount;
     }
 
     /**
      * 创建connection
+     *
      * @param dbPath
      * @return
      */
-    public static Connection createConnection(String dbPath) throws SQLException {
-        String JDBC = getDBUrl(dbPath);
+    public static SqliteBaseConnection createBaseConnection(String dbPath) throws SQLException {
+        if (SqliteUtils.isBlank(dbPath)) {
+            dbPath = DEFAULT_DB_PATH;
+        }
+        // 获取连接字符串
+        String JDBC = getJDBCStr(dbPath);
         try {
-            return DriverManager.getConnection(JDBC);
+            SqliteBaseConnection result = new SqliteBaseConnection();
+            if (!result.resetUri(JDBC)) {
+                result.setCreateTime(SqliteUtils.getNowStamp());
+                result.setConnection(DriverManager.getConnection(JDBC));
+            }
+            return result;
         } catch (SQLException e) {
             SqliteLogUtils.error("ERROR:[Connection对象创建异常]");
             e.printStackTrace();
@@ -159,7 +219,7 @@ public class SqliteBaseConnectionFactory {
      * @param dbPath
      * @return
      */
-    private static String getDBUrl(String dbPath) {
+    private static String getJDBCStr(String dbPath) {
         String JDBC = "jdbc:sqlite:/" + dbPath;
         if (SqliteUtils.isWindows()) {
             dbPath = dbPath.toLowerCase();
@@ -171,15 +231,23 @@ public class SqliteBaseConnectionFactory {
     /**
      * 添加新的链接到容器
      *
-     * @param num
+     * @param dbPath 数据库的路径
+     * @param num    添加的数量
      * @throws SQLException
-     * @author Allen
-     * @date 2016年10月31日
      */
-    private static void addConnection(String dbPath, int num) throws SQLException {
+    private static void addConnection(String dbPath, int num) {
         for (int i = 0; i < num; i++) {
-            checkConnection(dbPath);
-            sList.add(new SqliteBaseConnection(SqliteUtils.getNowStamp(), createConnection(dbPath)));
+            // 添加前检查连接池里面所有连接对象
+            checkAllIdleConnection();
+            // 创建新的连接对象
+            SqliteBaseConnection newSqliteConnection = null;
+            try {
+                newSqliteConnection = createBaseConnection(dbPath);
+            } catch (SQLException e) {
+                SqliteLogUtils.error("[addConnection]添加新连接异常！",e);
+                e.printStackTrace();
+            }
+            idleConList.add(newSqliteConnection);
         }
     }
 }

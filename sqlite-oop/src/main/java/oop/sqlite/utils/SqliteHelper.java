@@ -9,7 +9,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -178,8 +177,7 @@ public class SqliteHelper {
         Connection connection = null;
         try {
             // create a database connection
-            String JDBC_URL = this.getDBUrl();
-            connection = DriverManager.getConnection(JDBC_URL);
+            connection = getConnection();
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(300); // set timeout to 30 sec.
             System.out.println("执行查询语句==> " + sql);
@@ -210,8 +208,7 @@ public class SqliteHelper {
         Connection connection = null;
         try {
             // create a database connection
-            String JDBC_URL = this.getDBUrl();
-            connection = DriverManager.getConnection(JDBC_URL);
+            connection = getConnection();
             System.out.println("执行查询语句==> " + sql);
             PreparedStatement prep = connection.prepareStatement(sql);
             prep.setQueryTimeout(300);
@@ -247,8 +244,7 @@ public class SqliteHelper {
         Connection connection = null;
         try {
             // create a database connection
-            String JDBC_URL = this.getDBUrl();
-            connection = DriverManager.getConnection(JDBC_URL);
+            connection = getConnection();
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(300); // set timeout to 30 sec.
             System.out.println("执行查询语句==> " + sql);
@@ -279,8 +275,7 @@ public class SqliteHelper {
         Connection connection = null;
         try {
             // create a database connection
-            String JDBC_URL = this.getDBUrl();
-            connection = DriverManager.getConnection(JDBC_URL);
+            connection = getConnection();
             System.out.println("执行查询语句==> " + sql);
             PreparedStatement prep = connection.prepareStatement(sql);
             prep.setQueryTimeout(300);
@@ -316,8 +311,7 @@ public class SqliteHelper {
         Connection connection = null;
         try {
             // create a database connection
-            String JDBC_URL = this.getDBUrl();
-            connection = DriverManager.getConnection(JDBC_URL);
+            connection = getConnection();
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(300); // set timeout to 30 sec.
             System.out.println("执行查询语句==> " + sql);
@@ -347,8 +341,7 @@ public class SqliteHelper {
         Connection connection = null;
         try {
             // create a database connection
-            String JDBC_URL = this.getDBUrl();
-            connection = DriverManager.getConnection(JDBC_URL);
+            connection = getConnection();
             System.out.println("执行查询语句==> " + sql);
             PreparedStatement prep = connection.prepareStatement(sql);
             prep.setQueryTimeout(300);
@@ -385,8 +378,7 @@ public class SqliteHelper {
         SqliteConsoleBaseEntity consoleResult = new SqliteConsoleBaseEntity();
         try {
             // create a database connection
-            String JDBC_URL = this.getDBUrl();
-            connection = DriverManager.getConnection(JDBC_URL);
+            connection = getConnection();
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(30); // set timeout to 30 sec.
             System.out.println("执行非查询语句==> " + sql);
@@ -424,8 +416,7 @@ public class SqliteHelper {
         SqliteConsoleBaseEntity consoleResult = new SqliteConsoleBaseEntity();
         try {
             // create a database connection
-            String JDBC_URL = this.getDBUrl();
-            connection = DriverManager.getConnection(JDBC_URL);
+            connection = getConnection();
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(300); // set timeout to 30 sec.
             System.out.println("执行查询语句==> " + sql);
@@ -460,7 +451,6 @@ public class SqliteHelper {
      * @return
      */
     public SqliteConsoleBaseEntity cmdExecForConsole(String cmd) {
-        Connection connection = null;
         SqliteConsoleBaseEntity consoleResult = new SqliteConsoleBaseEntity();
         try {
             System.out.println("执行非查询语句==> " + cmd);
@@ -472,14 +462,6 @@ public class SqliteHelper {
             e.printStackTrace();
             consoleResult.setHasException(true);
             consoleResult.setException(e);
-        } finally {
-            try {
-                if (connection != null) connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-                consoleResult.setHasException(true);
-                consoleResult.setException(e);
-            }
         }
         return consoleResult;
     }
@@ -494,8 +476,7 @@ public class SqliteHelper {
         Connection connection = null;
         try {
             // create a database connection
-            String JDBC_URL = this.getDBUrl();
-            connection = DriverManager.getConnection(JDBC_URL);
+            connection = getConnection();
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(30); // set timeout to 30 sec.
             System.out.println("执行非查询语句==> " + sql);
@@ -525,8 +506,7 @@ public class SqliteHelper {
         Connection connection = null;
         try {
             // create a database connection
-            String JDBC_URL = this.getDBUrl();
-            connection = DriverManager.getConnection(JDBC_URL);
+            connection = getConnection();
             System.out.println("执行非查询语句==> " + sql);
             PreparedStatement prep = connection.prepareStatement(sql);
             prep.setQueryTimeout(30);
@@ -728,8 +708,8 @@ public class SqliteHelper {
      *
      * @return
      */
-    private String getDBUrl() {
-        StringBuffer currentDbPathSb = new StringBuffer("jdbc:sqlite:/").append(this.dbPath);
+    private Connection getConnection() throws SQLException {
+        StringBuffer currentDbPathSb = new StringBuffer(this.dbPath);
         switch (this.dbType) {
             case SqliteConstant.DB_TYPE_BY_MINUTE:
                 currentDbPathSb.append(SqliteUtils.nowFormatStr("yyyyMMddHHmm")).append(".db");
@@ -749,97 +729,7 @@ public class SqliteHelper {
             default:
                 break;
         }
-        String JDBC_URL = currentDbPathSb.toString();
-        if (SqliteUtils.isWindows()) {
-            return JDBC_URL.toLowerCase();
-        }
-        return JDBC_URL;
-    }
-
-    /**
-     * 获取固定格式的数据库路径信息
-     *
-     * @param dbPath
-     * @return
-     */
-    private static String getDBUrl(String dbPath) {
-        String JDBC = "jdbc:sqlite:/" + dbPath;
-        if (SqliteUtils.isWindows()) {
-            dbPath = dbPath.toLowerCase();
-            JDBC = "jdbc:sqlite:/" + dbPath;
-        }
-        return JDBC;
-    }
-
-    /*————————————————测试sqlite————————————————*/
-    public static void test() {
-        Connection connection = null;
-        try {
-            String TEST_DB_PATH = SqliteUtils.getClassRootPath(SqliteConstant.TEST_DB_PATH);
-            // create a database connection
-            String connectStr = getDBUrl(TEST_DB_PATH);
-            connection = DriverManager.getConnection(connectStr);
-            Statement statement = connection.createStatement();
-            statement.setQueryTimeout(30); // set timeout to 30 sec.
-            statement.executeUpdate("create table if not exists person (id integer, name string)");
-            statement.executeUpdate("insert into person values(1, 'leo')");
-            statement.executeUpdate("insert into person values(2, 'yui')");
-            ResultSet rs = statement.executeQuery("select * from person");
-            ResultSetMetaData rsmd = rs.getMetaData();
-            int count = rsmd.getColumnCount();
-            String[] name = new String[count];
-            for (int i = 0; i < count; i++) {
-                name[i] = rsmd.getColumnName(i + 1);
-            }
-            List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
-
-            while (rs.next()) {
-                Map<String, Object> one = new LinkedHashMap<String, Object>();
-
-                for (int i = 0; i < name.length; i++) {
-                    Object value = rs.getObject(i + 1);
-                    System.out.println(name[i] + ":" + value);
-                    one.put(name[i], value);
-                }
-                result.add(one);
-            }
-            String dataRes = SqliteUtils.getJson(result);
-            System.out.println(dataRes);
-
-            PreparedStatement prep = connection.prepareStatement(
-                    "insert into person values (?, ?)");
-            prep.setObject(1, 5);
-            prep.setObject(2, "asdfasdfas");
-            prep.execute();
-            prep = connection.prepareStatement(
-                    "select * from person where id=?");
-            prep.setObject(1, 5);
-            rs = prep.executeQuery();
-            while (rs.next()) {
-                System.out.println("id = " + rs.getString("id"));
-                System.out.println("name = " + rs.getString("name"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (connection != null) connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-    /*————————————————测试sqlite————————————————*/
-
-    /**
-     * 加载Sqlite.JDBC
-     */
-    static {//加载驱动器
-        try {
-            // load the sqlite-JDBC driver using the current class loader
-            Class.forName("org.sqlite.JDBC");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        String currDbPath = currentDbPathSb.toString();
+        return SqliteConnectionUtils.getConnection(currDbPath);
     }
 }

@@ -21,7 +21,7 @@ public class SqliteBaseConnectionFactory {
     private static int CON_MIN = SqliteUtils.parseInt(SqliteConfig.getValue("sqlite.connection.min"), 1);// 初始池链接
     private static int CON_STEP = SqliteUtils.parseInt(SqliteConfig.getValue("sqlite.connection.step"), 1);// 每次最大补充线程数量
     private static boolean REFRESH_CON_POOL = false;
-    private static boolean USE_CONNECT_POOL = Boolean.parseBoolean(SqliteConfig.getValue("sqlite.connection.pool"));
+    protected static boolean USE_CONNECT_POOL = Boolean.parseBoolean(SqliteConfig.getValue("sqlite.connection.pool"));
     protected static long CON_TIMEOUT = SqliteUtils.parseInt(SqliteConfig.getValue("sqlite.connection.timeout"), 500000);// 超时线程回收
     protected static Vector<SqliteBaseConnection> idleConList = new Vector<SqliteBaseConnection>();// 闲置连接
     protected static Vector<SqliteBaseConnection> runConList = new Vector<SqliteBaseConnection>();// 已分配的连接
@@ -72,7 +72,7 @@ public class SqliteBaseConnectionFactory {
      * @throws Exception
      * @throws SQLException
      */
-    public static Connection getConnection(String dbPath) throws SQLException {
+    public static Connection getConnection() throws SQLException {
         // 先进先出原则
         SqliteBaseConnection currCon = null;
         synchronized (idleConList) {
@@ -83,11 +83,27 @@ public class SqliteBaseConnectionFactory {
                 addRunningConnection(currCon);
             }
             if (currCon == null || currCon.getConnection() == null || currCon.getConnection().isClosed()) {
-                currCon = createBaseConnection(dbPath);
+                currCon = createBaseConnection();
                 addRunningConnection(currCon);
             }
         }
         return currCon.getConnection();
+    }
+    /**
+     * 获取链接
+     *
+     * @return
+     * @throws Exception
+     * @throws SQLException
+     */
+    public static Connection getConnection(String dbPath) throws SQLException {
+        if(DEFAULT_DB_PATH.equals(dbPath)){
+            return getConnection();
+        }else {
+            SqliteBaseConnection currCon = createBaseConnection(dbPath);
+            addRunningConnection(currCon);
+            return currCon.getConnection();
+        }
     }
 
     /**
@@ -174,7 +190,7 @@ public class SqliteBaseConnectionFactory {
         for (int i = 0; i < runConList.size(); i++) {
             con = runConList.get(i);
             try {
-                if(null == con.getConnection() || con.getConnection().isClosed() || SqliteUtils.getNowStamp() - con.getCreateTime() > CON_TIMEOUT){
+                if(null == con || null == con.getConnection() || con.getConnection().isClosed() || SqliteUtils.getNowStamp() - con.getCreateTime() > CON_TIMEOUT){
                     runConList.remove(i--);
                     runningRemoveCount++;
                 }
@@ -190,12 +206,21 @@ public class SqliteBaseConnectionFactory {
     /**
      * 创建connection
      *
+     * @return
+     */
+    public static SqliteBaseConnection createBaseConnection() throws SQLException {
+        return createBaseConnection(DEFAULT_DB_PATH);
+    }
+
+    /**
+     * 创建connection
+     *
      * @param dbPath
      * @return
      */
     public static SqliteBaseConnection createBaseConnection(String dbPath) throws SQLException {
         if (SqliteUtils.isBlank(dbPath)) {
-            dbPath = DEFAULT_DB_PATH;
+            return null;
         }
         // 获取连接字符串
         String JDBC = getJDBCStr(dbPath);
@@ -220,12 +245,16 @@ public class SqliteBaseConnectionFactory {
      * @return
      */
     private static String getJDBCStr(String dbPath) {
-        String JDBC = "jdbc:sqlite:/" + dbPath;
-        if (SqliteUtils.isWindows()) {
-            dbPath = dbPath.toLowerCase();
-            JDBC = "jdbc:sqlite:/" + dbPath;
+        if(null != dbPath && !dbPath.startsWith("jdbc:sqlite")) {
+            String JDBC = "jdbc:sqlite:/" + dbPath;
+            if (SqliteUtils.isWindows()) {
+                dbPath = dbPath.toLowerCase();
+                JDBC = "jdbc:sqlite:/" + dbPath;
+            }
+            return JDBC;
+        }else {
+            return dbPath;
         }
-        return JDBC;
     }
 
     /**

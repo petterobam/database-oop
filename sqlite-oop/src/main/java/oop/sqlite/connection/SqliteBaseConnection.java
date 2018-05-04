@@ -40,7 +40,7 @@ public class SqliteBaseConnection {
      */
     public boolean resetUri(String uri){
         try {
-            this.uri = this.uri;
+            this.uri = uri;
             this.createTime = SqliteUtils.getNowStamp();
             this.connection = DriverManager.getConnection(uri);
             return true;

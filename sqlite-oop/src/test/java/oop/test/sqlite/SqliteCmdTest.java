@@ -7,7 +7,7 @@ import org.junit.Test;
 public class SqliteCmdTest {
     @Test
     public void test7(){
-        SqliteHelper sqliteHelper = new SqliteHelper("/D:/Sqlite/dbs/test.db",true);
+        SqliteHelper sqliteHelper = new SqliteHelper("database/test.db",false);
         sqliteHelper.queryJsonResult("select * from person");
         sqliteHelper.cmdExec(".dd");
         String result = sqliteHelper.cmdExec(".tables");

@@ -19,14 +19,18 @@ public class SqliteConnectionPoolTest {
         SqliteConnectionPool.initConnectPoolThreads();
         // 检查连接池线程
         SqliteConnectionPool.checkTreadActiveStatus();
-        // 暂停十秒看线程执行打印日志
         try {
-            SqliteConnectionPool.getConnection(null);
-            SqliteConnectionPool.getConnection(null);
+            // 取两个连接，观察十秒看线程执行打印日志
+            SqliteConnectionPool.getConnection();
+            SqliteConnectionPool.getConnection();
             SqliteThreadUtils.sleep(10000);
-            SqliteConnectionPool.getConnection(null);
-            SqliteConnectionPool.getConnection(null);
-            SqliteConnectionPool.getConnection(null);
+            // 取三个连接，观察十秒看线程执行打印日志
+            SqliteConnectionPool.getConnection();
+            SqliteConnectionPool.getConnection();
+            SqliteConnectionPool.getConnection();
+            SqliteThreadUtils.sleep(10000);
+            // 关闭所有连接池线程，观察十秒看线程执行打印日志
+            SqliteConnectionPool.switchPool(false);
             SqliteThreadUtils.sleep(10000);
         } catch (InterruptedException e) {
             e.printStackTrace();

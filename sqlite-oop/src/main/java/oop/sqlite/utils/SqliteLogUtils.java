@@ -12,9 +12,11 @@ public class SqliteLogUtils {
      */
     public static final void info(String messagePattern, Object... argArray) {
         StringBuffer info = new StringBuffer("[sqlite-oop]-[info]");
-        info.append("-[").append(new Date()).append("]");
+        Date msgDatetime = new Date();
+        info.append("-[").append(msgDatetime).append("]");
         // 待处理： 代理获取调用类的类名信息、方法名信息等等
-        info.append("-[").append(print(messagePattern,argArray)).append("]");
+        String msgBodyStr = parseMsg(messagePattern,argArray);
+        info.append("-[").append(msgBodyStr).append("]");
         // 待处理： 这些info信息可以转储到其他地方，形成服务日志
         System.out.println(info.toString());
     }
@@ -25,9 +27,11 @@ public class SqliteLogUtils {
      */
     public static final void error(String messagePattern, Object... argArray) {
         StringBuffer info = new StringBuffer("[sqlite-oop]-[error]");
-        info.append("-[").append(new Date()).append("]");
+        Date msgDatetime = new Date();
+        info.append("-[").append(msgDatetime).append("]");
         // 待处理： 代理获取调用类的类名信息、方法名信息等等
-        info.append("-[").append(print(messagePattern,argArray)).append("]");
+        String msgBodyStr = parseMsg(messagePattern,argArray);
+        info.append("-[").append(msgBodyStr).append("]");
         // 待处理： 这些info信息可以转储到其他地方，形成服务日志
         System.out.println(info.toString());
     }
@@ -38,9 +42,11 @@ public class SqliteLogUtils {
      */
     public static final void warn(String messagePattern, Object... argArray) {
         StringBuffer info = new StringBuffer("[sqlite-oop]-[warn]");
-        info.append("-[").append(new Date()).append("]");
+        Date msgDatetime = new Date();
+        info.append("-[").append(msgDatetime).append("]");
         // 待处理： 代理获取调用类的类名信息、方法名信息等等
-        info.append("-[").append(print(messagePattern,argArray)).append("]");
+        String msgBodyStr = parseMsg(messagePattern,argArray);
+        info.append("-[").append(msgBodyStr).append("]");
         // 待处理： 这些info信息可以转储到其他地方，形成服务日志
         System.out.println(info.toString());
     }
@@ -51,9 +57,11 @@ public class SqliteLogUtils {
      */
     public static final void debug(String messagePattern, Object... argArray) {
         StringBuffer info = new StringBuffer("[sqlite-oop]-[debug]");
-        info.append("-[").append(new Date()).append("]");
+        Date msgDatetime = new Date();
+        info.append("-[").append(msgDatetime).append("]");
         // 待处理： 代理获取调用类的类名信息、方法名信息等等
-        info.append("-[").append(print(messagePattern,argArray)).append("]");
+        String msgBodyStr = parseMsg(messagePattern,argArray);
+        info.append("-[").append(msgBodyStr).append("]");
         // 待处理： 这些info信息可以转储到其他地方，形成服务日志
         System.out.println(info.toString());
     }
@@ -63,7 +71,7 @@ public class SqliteLogUtils {
      * @param argArray
      * @return
      */
-    public static final String print(String messagePattern, Object[] argArray) {
+    private static final String parseMsg(String messagePattern, Object[] argArray) {
         StringBuilder sbuf = new StringBuilder(messagePattern.length() + 50);
         Throwable throwableCandidate = getThrowableCandidate(argArray);
         Object[] args = argArray;
@@ -99,8 +107,6 @@ public class SqliteLogUtils {
                 }
             }
             sbuf.append(messagePattern, i, messagePattern.length());
-            //该日志信息可以转储
-            System.out.println(sbuf.toString());
         }
         if(null != throwableCandidate){
             //throwableCandidate.printStackTrace();

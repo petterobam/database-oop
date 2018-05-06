@@ -7,6 +7,7 @@ import oop.sqlite.utils.SqliteUtils;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Vector;
 
 /**
@@ -17,12 +18,13 @@ import java.util.Vector;
  */
 public class SqliteBaseConnectionFactory {
     private static String DEFAULT_DB_PATH = SqliteConfig.getUri();//默认库
-    private static int CON_MAX = SqliteUtils.parseInt(SqliteConfig.getValue("sqlite.connection.max"), 2);// 最大池链接
-    private static int CON_MIN = SqliteUtils.parseInt(SqliteConfig.getValue("sqlite.connection.min"), 1);// 初始池链接
-    private static int CON_STEP = SqliteUtils.parseInt(SqliteConfig.getValue("sqlite.connection.step"), 1);// 每次最大补充线程数量
+    private static int CON_MAX = SqliteConfig.getPoolConnectionMax();// 最大池链接
+    private static int CON_MIN = SqliteConfig.getPoolConnectionMin();// 初始池链接
+    private static int CON_STEP = SqliteConfig.getPoolConnectionStep();// 每次最大补充线程数量
     private static boolean REFRESH_CON_POOL = false;
-    protected static boolean USE_CONNECT_POOL = Boolean.parseBoolean(SqliteConfig.getValue("sqlite.connection.pool"));
-    protected static long CON_TIMEOUT = SqliteUtils.parseInt(SqliteConfig.getValue("sqlite.connection.timeout"), 500000);// 超时线程回收
+    protected static boolean USE_CONNECT_POOL = SqliteConfig.isConnectionPoolEnable();
+    protected static long CON_TIMEOUT = SqliteConfig.getPoolConnectionTimeout();// 超时线程回收
+    protected static boolean USE_SELF_INNER_CONFIG = SqliteConfig.isConnectionWithCofig();
     protected static Vector<SqliteBaseConnection> idleConList = new Vector<SqliteBaseConnection>();// 闲置连接
     protected static Vector<SqliteBaseConnection> runConList = new Vector<SqliteBaseConnection>();// 已分配的连接
 
@@ -41,7 +43,7 @@ public class SqliteBaseConnectionFactory {
      */
     private static void init() {
         try {
-            if(Boolean.parseBoolean(SqliteConfig.getValue("sqlite.path.classpath"))){
+            if(SqliteConfig.isPathBaseClasspath()){
                 DEFAULT_DB_PATH = SqliteUtils.getClassRootPath(DEFAULT_DB_PATH);
             }
             loadSqliteJdbcClass();//加载 org.sqlite.JDBC
@@ -267,7 +269,7 @@ public class SqliteBaseConnectionFactory {
     private static void addConnection(String dbPath, int num) {
         for (int i = 0; i < num; i++) {
             // 添加前检查连接池里面所有连接对象
-            checkAllIdleConnection();
+            // checkAllIdleConnection();
             // 创建新的连接对象
             SqliteBaseConnection newSqliteConnection = null;
             try {

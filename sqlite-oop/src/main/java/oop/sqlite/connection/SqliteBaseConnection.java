@@ -1,5 +1,6 @@
 package oop.sqlite.connection;
 
+import oop.sqlite.config.SqliteConfig;
 import oop.sqlite.utils.SqliteLogUtils;
 import oop.sqlite.utils.SqliteUtils;
 
@@ -42,7 +43,11 @@ public class SqliteBaseConnection {
         try {
             this.uri = uri;
             this.createTime = SqliteUtils.getNowStamp();
-            this.connection = DriverManager.getConnection(uri);
+            if(SqliteBaseConnectionFactory.USE_SELF_INNER_CONFIG){
+                this.connection = DriverManager.getConnection(uri, SqliteConfig.getConfig().toProperties());
+            }else {
+                this.connection = DriverManager.getConnection(uri);
+            }
             return true;
         } catch (SQLException e) {
             SqliteLogUtils.error("[resetUri]重置连接对象失败！",e);
@@ -58,7 +63,11 @@ public class SqliteBaseConnection {
     public boolean refreshConnection(){
         try {
             this.createTime = SqliteUtils.getNowStamp();
-            this.connection = DriverManager.getConnection(this.uri);
+            if(SqliteBaseConnectionFactory.USE_SELF_INNER_CONFIG){
+                this.connection = DriverManager.getConnection(uri, SqliteConfig.getConfig().toProperties());
+            }else {
+                this.connection = DriverManager.getConnection(uri);
+            }
             return true;
         } catch (SQLException e) {
             SqliteLogUtils.error("[refreshConnection]重新建立连接对象失败！",e);
@@ -86,7 +95,11 @@ public class SqliteBaseConnection {
     public Connection getConnection() {
         if(null == this.connection){
             try {
-                this.connection = DriverManager.getConnection(this.uri);
+                if(SqliteBaseConnectionFactory.USE_SELF_INNER_CONFIG){
+                    this.connection = DriverManager.getConnection(uri, SqliteConfig.getConfig().toProperties());
+                }else {
+                    this.connection = DriverManager.getConnection(uri);
+                }
             } catch (SQLException e) {
                 SqliteLogUtils.error("连接建立失败！",e);
                 e.printStackTrace();

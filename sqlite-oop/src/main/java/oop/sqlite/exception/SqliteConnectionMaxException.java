@@ -19,8 +19,7 @@ public final class SqliteConnectionMaxException extends Exception {
      * 构造函数
      */
     public SqliteConnectionMaxException(){
-        String maxValue = SqliteConfig.getValue("sqlite.connection.max");
-        this.max = SqliteUtils.parseInt(maxValue,2);
+        this.max = SqliteConfig.getPoolConnectionMax();
     }
 
     /**

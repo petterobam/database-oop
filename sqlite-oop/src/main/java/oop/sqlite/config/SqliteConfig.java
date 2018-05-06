@@ -1,5 +1,6 @@
 package oop.sqlite.config;
 
+import oop.sqlite.utils.SqliteUtils;
 import org.sqlite.SQLiteConfig;
 
 import java.io.IOException;
@@ -34,10 +35,11 @@ public class SqliteConfig {
 
     /**
      * 单例模式获取配置对象
+     *
      * @return
      */
-    public SQLiteConfig getConfig(){
-        if(null == config){
+    public static SQLiteConfig getConfig() {
+        if (null == config) {
             config = new SQLiteConfig(properties);
         }
         return config;
@@ -45,9 +47,10 @@ public class SqliteConfig {
 
     /**
      * 动态加载新配置
+     *
      * @param classPath
      */
-    public void loadConfig(String classPath){
+    public static void loadConfig(String classPath) {
         try {
             //使用 properties 配置文件，默认在 config/sqlite.properties 目录下面，若该项目被引用，启动项目只需要在相同目录下相同配置文件覆盖即可生效
             properties.load(SqliteConfig.class.getClassLoader().getResourceAsStream(classPath));
@@ -69,23 +72,96 @@ public class SqliteConfig {
 
     /**
      * 默认要配置的参数：数据库uri
+     *
      * @return
      */
     public static String getUri() {
         return properties.getProperty("sqlite.uri");
     }
+
     /**
      * 默认要配置的参数：用户名
+     *
      * @return
      */
     public static String getUserName() {
         return properties.getProperty("sqlite.username");
     }
+
     /**
      * 默认要配置的参数：密码
+     *
      * @return
      */
     public static String getPassword() {
         return properties.getProperty("sqlite.password");
+    }
+
+    /*********************************************连接相关配置******************************************/
+    /**
+     * 获取connection对象的时候是否加载对内置配置的自定义配置
+     *
+     * @return
+     */
+    public static boolean isConnectionWithCofig() {
+        return Boolean.parseBoolean(properties.getProperty("sqlite.config.enable"));
+    }
+
+    /**
+     * 数据库路径是否是基于classpath路径
+     *
+     * @return
+     */
+    public static boolean isPathBaseClasspath() {
+        return Boolean.parseBoolean(properties.getProperty("sqlite.path.classpath"));
+    }
+
+    /***********************************连接池相关配置*********************************************/
+    /**
+     * 是否开启连接池
+     * @return
+     */
+    public static boolean isConnectionPoolEnable() {
+        return Boolean.parseBoolean(properties.getProperty("sqlite.connection.pool.enable"));
+    }
+
+    /**
+     * 连接池最大连接对象数量
+     * @return
+     */
+    public static int getPoolConnectionMax() {
+        return SqliteUtils.parseInt(properties.getProperty("sqlite.connection.max"), 2);
+    }
+
+    /**
+     * 连接池最小连接对象数量
+     * @return
+     */
+    public static int getPoolConnectionMin() {
+        return SqliteUtils.parseInt(properties.getProperty("sqlite.connection.min"), 1);
+    }
+
+    /**
+     * 连接池每次新增连接对象最大数量
+     * @return
+     */
+    public static int getPoolConnectionStep() {
+        return SqliteUtils.parseInt(properties.getProperty("sqlite.connection.step"), 1);
+    }
+
+    /**
+     * 连接池分配后失效清除时间
+     * @return
+     */
+    public static int getPoolConnectionTimeout() {
+        return SqliteUtils.parseInt(properties.getProperty("sqlite.connection.timeout"), 500000);
+    }
+
+    /**
+     * 连接池线程轮询时长
+     * @return
+     */
+    public static int getPoolThreadSleep() {
+        return SqliteUtils.parseInt(properties.getProperty("sqlite.pool.thread.sleep"), 1000);
     }
 }

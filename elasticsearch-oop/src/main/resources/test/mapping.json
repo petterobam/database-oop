@@ -1,0 +1,18 @@
+{
+  "indexType1": {
+    "properties": {
+      "id": {
+        "type": "keyword",
+        "store": true
+      },
+      "name": {
+        "type": "text",
+        "store": true
+      },
+      "article": {
+        "type": "text",
+        "store": true
+      }
+    }
+  }
+}

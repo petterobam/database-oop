@@ -113,17 +113,16 @@ public class SqliteSqlHelper<T extends SqliteBaseEntity> {
     /**
      * 根据Id删除Sql
      *
-     * @param id
      */
-    public String createDeleteById(Object id) {
-        return createSelectById(id,null);
+    public String createDeleteById() {
+        return createDeleteById(null);
     }
     /**
      * 根据Id删除Sql
      *
-     * @param id
+     * @param tableExt
      */
-    public String createDeleteById(Object id,String tableExt) {
+    public String createDeleteById(String tableExt) {
         StringBuffer sqlBuffer = new StringBuffer();
         sqlBuffer.append("DELETE FROM ").append(this.getTableName(tableExt)).append(" WHERE ");
         sqlBuffer.append(this.idName).append("=?");

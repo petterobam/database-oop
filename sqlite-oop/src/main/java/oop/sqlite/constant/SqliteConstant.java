@@ -25,4 +25,8 @@ public class SqliteConstant {
     public static final int DB_TYPE_BY_DAY = 3;//按天自动分库
     public static final int DB_TYPE_BY_MOUTH = 4;//按月自动分库
     public static final int DB_TYPE_BY_YEAR = 5;//按年自动分库
+    /**
+     * 默认批量插入条数
+     */
+    public static final int DEFAULT_BATCH_COUNT = 100;
 }

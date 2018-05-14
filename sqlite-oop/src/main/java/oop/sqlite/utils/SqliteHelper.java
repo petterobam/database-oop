@@ -1,6 +1,7 @@
 package oop.sqlite.utils;
 
 import oop.sqlite.annotation.SqliteTable;
+import oop.sqlite.base.SqliteBaseEntity;
 import oop.sqlite.config.SqliteConfig;
 import oop.sqlite.console.SqliteConsoleBaseEntity;
 import oop.sqlite.constant.SqliteConstant;
@@ -25,7 +26,7 @@ import java.util.Map;
  * @author 欧阳洁
  * @create 2017-09-29 17:48
  **/
-public class SqliteHelper {
+public class SqliteHelper<T extends SqliteBaseEntity> {
     /**
      * 数据库路径
      */
@@ -40,7 +41,7 @@ public class SqliteHelper {
      *
      * @param targetClass
      */
-    public SqliteHelper(Class<?> targetClass) {
+    public SqliteHelper(Class<T> targetClass) {
         this.dbPath = SqliteUtils.isBlank(SqliteConfig.getUri()) ? SqliteConstant.DB_PATH : SqliteConfig.getUri();
         this.dbType = SqliteConstant.DB_TYPE_DEFAULT;
         SqliteTable sqliteTable = targetClass.getAnnotation(SqliteTable.class);
@@ -104,7 +105,7 @@ public class SqliteHelper {
     }
 
     /**
-     * 插入，带参数
+     * 插入
      *
      * @param sql
      * @param param
@@ -112,6 +113,48 @@ public class SqliteHelper {
      */
     public int insert(String sql, List<Object> param) {
         return this.execute(sql, param);
+    }
+
+    /**
+     * 批量插入
+     *
+     * @param sqlList
+     * @return
+     */
+    public int batchInsertSql(List<String> sqlList) {
+        return this.batchExecuteSql(sqlList);
+    }
+
+    /**
+     * 批量插入
+     *
+     * @param sqlList
+     * @param batchCount
+     * @return
+     */
+    public int batchInsertSql(List<String> sqlList, int batchCount) {
+        return this.batchExecuteSql(sqlList, batchCount);
+    }
+
+    /**
+     * 批量插入，带参数
+     *
+     * @param sqlMapParamList
+     * @return
+     */
+    public int batchInsert(List<T> sqlMapParamList) {
+        return this.batchExecute(sqlMapParamList);
+    }
+
+    /**
+     * 批量插入，带参数
+     *
+     * @param sqlMapParamList
+     * @param batchCount
+     * @return
+     */
+    public int batchInsert(List<T> sqlMapParamList, int batchCount) {
+        return this.batchExecute(sqlMapParamList, batchCount);
     }
 
     /**
@@ -136,6 +179,48 @@ public class SqliteHelper {
     }
 
     /**
+     * 批量更新
+     *
+     * @param sqlList
+     * @return
+     */
+    public int batchUpdateSql(List<String> sqlList) {
+        return this.batchExecuteSql(sqlList);
+    }
+
+    /**
+     * 批量更新
+     *
+     * @param sqlList
+     * @param batchCount
+     * @return
+     */
+    public int batchUpdateSql(List<String> sqlList, int batchCount) {
+        return this.batchExecuteSql(sqlList, batchCount);
+    }
+
+    /**
+     * 批量更新，带参数
+     *
+     * @param sqlMapParamList
+     * @return
+     */
+    public int batchUpdate(List<T> sqlMapParamList) {
+        return this.batchExecute(sqlMapParamList);
+    }
+
+    /**
+     * 批量更新，带参数
+     *
+     * @param sqlMapParamList
+     * @param batchCount
+     * @return
+     */
+    public int batchUpdate(List<T> sqlMapParamList, int batchCount) {
+        return this.batchExecute(sqlMapParamList, batchCount);
+    }
+
+    /**
      * 删除
      *
      * @param sql
@@ -154,6 +239,60 @@ public class SqliteHelper {
      */
     public int delete(String sql, List<Object> param) {
         return this.execute(sql, param);
+    }
+
+    /**
+     * 批量删除
+     *
+     * @param sqlList
+     * @return
+     */
+    public int batchDeleteSql(List<String> sqlList) {
+        return this.batchExecuteSql(sqlList);
+    }
+
+    /**
+     * 批量删除
+     *
+     * @param sqlList
+     * @param batchCount
+     * @return
+     */
+    public int batchDeleteSql(List<String> sqlList, int batchCount) {
+        return this.batchExecuteSql(sqlList, batchCount);
+    }
+
+    /**
+     * 批量删除，带参数
+     *
+     * @param sqlMapParamList
+     * @return
+     */
+    public int batchDelete(List<T> sqlMapParamList) {
+        return this.batchExecute(sqlMapParamList);
+    }
+
+    /**
+     * 批量删除，带参数
+     *
+     * @param sqlMapParamList
+     * @param batchCount
+     * @return
+     */
+    public int batchDelete(List<T> sqlMapParamList, int batchCount) {
+        return this.batchExecute(sqlMapParamList, batchCount);
+    }
+
+    /**
+     * 根据Id集合批量删除
+     *
+     * @param idParamSql
+     * @param idList
+     * @param batchCount
+     * @return
+     */
+    public int batchDeleteByIdList(String idParamSql, List<Object> idList, int batchCount) {
+        return this.batchExecuteByIdList(idParamSql, idList, batchCount);
     }
 
     /**
@@ -180,7 +319,7 @@ public class SqliteHelper {
             connection = getConnection();
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(300); // set timeout to 30 sec.
-            System.out.println("执行查询语句==> " + sql);
+            SqliteLogUtils.info("执行查询语句==> " + sql);
             ResultSet rs = statement.executeQuery(sql);
 
             return this.getDataJson(rs, columnMap);
@@ -209,7 +348,7 @@ public class SqliteHelper {
         try {
             // create a database connection
             connection = getConnection();
-            System.out.println("执行查询语句==> " + sql);
+            SqliteLogUtils.info("执行查询语句==> " + sql);
             PreparedStatement prep = connection.prepareStatement(sql);
             prep.setQueryTimeout(300);
             if (SqliteUtils.isNotEmpty(param)) {
@@ -247,7 +386,7 @@ public class SqliteHelper {
             connection = getConnection();
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(300); // set timeout to 30 sec.
-            System.out.println("执行查询语句==> " + sql);
+            SqliteLogUtils.info("执行查询语句==> " + sql);
             ResultSet rs = statement.executeQuery(sql);
 
             rs.next();//第一行
@@ -276,7 +415,7 @@ public class SqliteHelper {
         try {
             // create a database connection
             connection = getConnection();
-            System.out.println("执行查询语句==> " + sql);
+            SqliteLogUtils.info("执行查询语句==> " + sql);
             PreparedStatement prep = connection.prepareStatement(sql);
             prep.setQueryTimeout(300);
             if (SqliteUtils.isNotEmpty(param)) {
@@ -314,7 +453,7 @@ public class SqliteHelper {
             connection = getConnection();
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(300); // set timeout to 30 sec.
-            System.out.println("执行查询语句==> " + sql);
+            SqliteLogUtils.info("执行查询语句==> " + sql);
             ResultSet rs = statement.executeQuery(sql);
 
             return this.getListMap(rs);
@@ -342,7 +481,7 @@ public class SqliteHelper {
         try {
             // create a database connection
             connection = getConnection();
-            System.out.println("执行查询语句==> " + sql);
+            SqliteLogUtils.info("执行查询语句==> " + sql);
             PreparedStatement prep = connection.prepareStatement(sql);
             prep.setQueryTimeout(300);
             if (SqliteUtils.isNotEmpty(param)) {
@@ -381,9 +520,9 @@ public class SqliteHelper {
             connection = getConnection();
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(30); // set timeout to 30 sec.
-            System.out.println("执行非查询语句==> " + sql);
+            SqliteLogUtils.info("执行非查询语句==> " + sql);
             int result = statement.executeUpdate(sql);
-            System.out.println("执行非查询语句影响行数==> " + result);
+            SqliteLogUtils.info("执行非查询语句影响行数==> " + result);
             consoleResult.setInfactLine(result);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -419,7 +558,7 @@ public class SqliteHelper {
             connection = getConnection();
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(300); // set timeout to 30 sec.
-            System.out.println("执行查询语句==> " + sql);
+            SqliteLogUtils.info("执行查询语句==> " + sql);
             ResultSet rs = statement.executeQuery(sql);
             List<Map<String, Object>> queryResult = this.getListMap(rs);
             consoleResult.setQueryResult(queryResult);
@@ -453,9 +592,9 @@ public class SqliteHelper {
     public SqliteConsoleBaseEntity cmdExecForConsole(String cmd) {
         SqliteConsoleBaseEntity consoleResult = new SqliteConsoleBaseEntity();
         try {
-            System.out.println("执行非查询语句==> " + cmd);
+            SqliteLogUtils.info("执行非查询语句==> " + cmd);
             String result = this.cmdExec(cmd);
-            System.out.println("执行非查询语句影响行数==> " + result);
+            SqliteLogUtils.info("执行非查询语句影响行数==> " + result);
             consoleResult.setCmdResult(result);
             consoleResult.setInfactLine(0);
         } catch (Exception e) {
@@ -479,9 +618,9 @@ public class SqliteHelper {
             connection = getConnection();
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(30); // set timeout to 30 sec.
-            System.out.println("执行非查询语句==> " + sql);
+            SqliteLogUtils.info("执行非查询语句==> " + sql);
             int result = statement.executeUpdate(sql);
-            System.out.println("执行非查询语句影响行数==> " + result);
+            SqliteLogUtils.info("执行非查询语句影响行数==> " + result);
             return result;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -507,7 +646,7 @@ public class SqliteHelper {
         try {
             // create a database connection
             connection = getConnection();
-            System.out.println("执行非查询语句==> " + sql);
+            SqliteLogUtils.info("执行非查询语句==> " + sql);
             PreparedStatement prep = connection.prepareStatement(sql);
             prep.setQueryTimeout(30);
             if (SqliteUtils.isNotEmpty(param)) {
@@ -517,7 +656,196 @@ public class SqliteHelper {
                 }
             }
             int result = prep.executeUpdate();
-            System.out.println("执行非查询语句影响行数==> " + result);
+            SqliteLogUtils.info("执行非查询语句影响行数==> " + result);
+            return result;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        } finally {
+            try {
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 非查询语句批量执行Sql语句
+     *
+     * @param sqlList
+     * @return
+     */
+    public int batchExecuteSql(List<String> sqlList) {
+        return this.batchExecuteSql(sqlList, SqliteConstant.DEFAULT_BATCH_COUNT);
+    }
+
+    /**
+     * 非查询语句批量执行Sql语句
+     *
+     * @param sqlList
+     * @param batchCount
+     * @return
+     */
+    public int batchExecuteSql(List<String> sqlList, int batchCount) {
+        Connection connection = null;
+        try {
+            int result = 0;
+            if (SqliteUtils.isNotEmpty(sqlList)) {
+                if (batchCount <= 0) {//默认批量提交粒度100条
+                    batchCount = SqliteConstant.DEFAULT_BATCH_COUNT;
+                }
+                // create a database connection
+                connection = this.getConnection();
+                connection.setAutoCommit(false);//单次执行不自动提交
+                Statement statement = connection.createStatement();
+                for (String sql : sqlList) {
+                    if (!SqliteUtils.isBlank(sql)) {
+                        statement.addBatch(sql);
+                        result++;
+                    }
+                    if (result % batchCount == 0) {
+                        statement.executeBatch();
+                        connection.commit();// 提交
+                        if (null == connection || connection.isClosed()) { //如果连接关闭了 就在创建一个 为什么要这样 原因是 connection.commit()后可能conn被关闭
+                            connection = this.getConnection();
+                            connection.setAutoCommit(false);
+                        }
+                    }
+                }
+                statement.executeBatch();
+                statement.close();
+                connection.commit();// 提交
+                connection.setAutoCommit(true);
+            }
+            return result;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        } finally {
+            try {
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 非查询语句批量执行Sql语句
+     *
+     * @param sqlMapParamList
+     * @return
+     */
+    public int batchExecute(List<T> sqlMapParamList) {
+        return this.batchExecute(sqlMapParamList, SqliteConstant.DEFAULT_BATCH_COUNT);
+    }
+
+    /**
+     * 非查询语句批量执行Sql语句
+     *
+     * @param sqlMapParamList
+     * @param batchCount
+     * @return
+     */
+    public int batchExecute(List<T> sqlMapParamList, int batchCount) {
+        Connection connection = null;
+        try {
+            int result = 0;
+            if (SqliteUtils.isNotEmpty(sqlMapParamList)) {
+                if (batchCount <= 0) {//默认批量提交粒度100条
+                    batchCount = SqliteConstant.DEFAULT_BATCH_COUNT;
+                }
+                // create a database connection
+                connection = getConnection();
+                connection.setAutoCommit(false);//单次执行不自动提交
+                PreparedStatement prep = null;
+                String preSql = null;
+                int currCount = 0;
+                for (T sqlAndParam : sqlMapParamList) {
+                    if (!SqliteUtils.isBlank(sqlAndParam.getCurrentSql())) {
+                        if (!SqliteUtils.equals(preSql, sqlAndParam.getCurrentSql()) || currCount % batchCount == 0) {
+                            if(currCount > 0) {
+                                currCount = 0;
+                                prep.executeBatch();
+                                connection.commit();// 提交
+                                if (null == connection || connection.isClosed()) { //如果连接关闭了 就在创建一个 为什么要这样 原因是 connection.commit()后可能conn被关闭
+                                    connection = this.getConnection();
+                                    connection.setAutoCommit(false);
+                                }
+                            }
+                            prep = connection.prepareStatement(sqlAndParam.getCurrentSql());
+                        }
+                        if (SqliteUtils.isNotEmpty(sqlAndParam.getCurrentParam())) {
+                            int count = 1;
+                            for (Object o : sqlAndParam.getCurrentParam()) {
+                                prep.setObject(count++, o);
+                            }
+                        }
+                        prep.addBatch();
+                        result++;
+                        currCount++;
+                        preSql = sqlAndParam.getCurrentSql();
+                    }
+                }
+                prep.executeBatch();
+                connection.commit();// 提交
+                connection.setAutoCommit(true);
+            }
+            return result;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        } finally {
+            try {
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 非查询语句批量执行Sql语句
+     *
+     * @param idParamSql
+     * @param idList
+     * @param batchCount
+     * @return
+     */
+    public int batchExecuteByIdList(String idParamSql, List<Object> idList, int batchCount) {
+        Connection connection = null;
+        try {
+            int result = 0;
+            if (SqliteUtils.isNotEmpty(idList)) {
+                if (batchCount <= 0) {//默认批量提交粒度100条
+                    batchCount = SqliteConstant.DEFAULT_BATCH_COUNT;
+                }
+                // create a database connection
+                connection = getConnection();
+                connection.setAutoCommit(false);//单次执行不自动提交
+                PreparedStatement prep = null;
+                prep = connection.prepareStatement(idParamSql);
+                for (Object id : idList) {
+                    if (null != id) {
+                        prep.setObject(1, id);
+                        prep.addBatch();
+                        result++;
+                        if (result % batchCount == 0) {
+                            prep.executeBatch();
+                            connection.commit();// 提交
+                            if (null == connection || connection.isClosed()) { //如果连接关闭了 就在创建一个 为什么要这样 原因是 connection.commit()后可能conn被关闭
+                                connection = this.getConnection();
+                                connection.setAutoCommit(false);
+                            }
+                        }
+                    }
+                }
+                prep.executeBatch();
+                prep.close();
+                connection.commit();// 提交
+                connection.setAutoCommit(true);
+            }
             return result;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -555,7 +883,7 @@ public class SqliteHelper {
             result.add(one);
         }
         String dataStr = SqliteUtils.getJson(result);
-        System.out.println("执行查询语句结果==> " + dataStr);
+        SqliteLogUtils.info("执行查询语句结果==> " + dataStr);
         return dataStr;
     }
 
@@ -584,7 +912,7 @@ public class SqliteHelper {
             result.add(one);
         }
         String dataStr = SqliteUtils.getJson(result);
-        System.out.println("执行查询语句结果==> " + dataStr);
+        SqliteLogUtils.info("执行查询语句结果==> " + dataStr);
         return dataStr;
     }
 
@@ -644,7 +972,7 @@ public class SqliteHelper {
                 }
             }
             String str = baos.toString();
-            System.out.println("执行cmd命令[" + cmd + "]==> " + str);
+            SqliteLogUtils.info("执行cmd命令[" + cmd + "]==> " + str);
             return str;
         } catch (IOException e) {
             e.printStackTrace();

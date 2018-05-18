@@ -3,7 +3,6 @@ package oop.sqlite.connection;
 import oop.sqlite.config.SqliteConfig;
 import oop.sqlite.thread.SqliteThreadUtils;
 import oop.sqlite.utils.SqliteLogUtils;
-import oop.sqlite.utils.SqliteUtils;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -126,6 +125,7 @@ public class SqliteConnectionPool extends SqliteBaseConnectionFactory {
                             break;// 如果配置不使用连接池，结束线程
                         }
                         SqliteThreadUtils.sleep(SLEEP);
+                        REFRESH_CON_POOL = true;
                         checkAllIdleConnection();
                     } catch (InterruptedException e) {
                         idleConList.clear();

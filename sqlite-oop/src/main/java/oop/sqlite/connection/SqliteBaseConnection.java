@@ -20,7 +20,7 @@ public class SqliteBaseConnection {
     private Connection connection;// 链接对象
 
     public SqliteBaseConnection() {
-        // TODO Auto-generated constructor stub
+        this.createTime = SqliteUtils.getNowStamp();
     }
 
     /**
@@ -92,6 +92,10 @@ public class SqliteBaseConnection {
         this.createTime = createTime;
     }
 
+    /**
+     * 获取连接
+     * @return
+     */
     public Connection getConnection() {
         if(null == this.connection){
             try {

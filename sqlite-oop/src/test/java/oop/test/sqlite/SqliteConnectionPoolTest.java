@@ -38,5 +38,4 @@ public class SqliteConnectionPoolTest {
             e.printStackTrace();
         }
     }
-
 }

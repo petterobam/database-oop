@@ -21,7 +21,7 @@ public class SqliteBaseConnectionFactory {
     private static int CON_MAX = SqliteConfig.getPoolConnectionMax();// 最大池链接
     private static int CON_MIN = SqliteConfig.getPoolConnectionMin();// 初始池链接
     private static int CON_STEP = SqliteConfig.getPoolConnectionStep();// 每次最大补充线程数量
-    private static boolean REFRESH_CON_POOL = false;
+    protected static boolean REFRESH_CON_POOL = false;
     protected static boolean USE_CONNECT_POOL = SqliteConfig.isConnectionPoolEnable();
     protected static long CON_TIMEOUT = SqliteConfig.getPoolConnectionTimeout();// 超时线程回收
     protected static boolean USE_SELF_INNER_CONFIG = SqliteConfig.isConnectionWithCofig();

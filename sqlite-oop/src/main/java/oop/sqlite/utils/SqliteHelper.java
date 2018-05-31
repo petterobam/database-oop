@@ -50,7 +50,9 @@ public class SqliteHelper<T extends SqliteBaseEntity> {
             this.dbType = sqliteTable.dbType();
         }
         // 默认相对路径
-        this.dbPath = SqliteUtils.getClassRootPath(this.dbPath);
+        if(SqliteConfig.isPathBaseClasspath()) {
+            this.dbPath = SqliteUtils.getClassRootPath(this.dbPath);
+        }
     }
 
     /**
@@ -64,7 +66,9 @@ public class SqliteHelper<T extends SqliteBaseEntity> {
         }
         this.dbType = SqliteConstant.DB_TYPE_DEFAULT;
         // 默认相对路径
-        this.dbPath = SqliteUtils.getClassRootPath(this.dbPath);
+        if(SqliteConfig.isPathBaseClasspath()) {
+            this.dbPath = SqliteUtils.getClassRootPath(this.dbPath);
+        }
     }
 
     /**
@@ -1042,6 +1046,18 @@ public class SqliteHelper<T extends SqliteBaseEntity> {
      * @return
      */
     private Connection getConnection() throws SQLException {
+        String currDbPath = getCurrDbPath();
+        return SqliteConnectionUtils.getConnection(currDbPath);
+    }
+
+    /**
+     * 获取当前数据库名（分库）
+     * @return
+     */
+    public String getCurrDbPath(){
+        if(SqliteConstant.DB_TYPE_DEFAULT == this.dbType){
+            return this.dbPath;
+        }
         StringBuffer currentDbPathSb = new StringBuffer(this.dbPath);
         switch (this.dbType) {
             case SqliteConstant.DB_TYPE_BY_MINUTE:
@@ -1063,6 +1079,6 @@ public class SqliteHelper<T extends SqliteBaseEntity> {
                 break;
         }
         String currDbPath = currentDbPathSb.toString();
-        return SqliteConnectionUtils.getConnection(currDbPath);
+        return currDbPath;
     }
 }

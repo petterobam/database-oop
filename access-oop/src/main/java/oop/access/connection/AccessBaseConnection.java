@@ -1,0 +1,114 @@
+package oop.access.connection;
+
+import oop.access.config.AccessConfig;
+import oop.access.utils.AccessLogUtils;
+import oop.access.utils.AccessUtils;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+/**
+ * access连接自定义封装类
+ *
+ * @author 欧阳洁
+ * @since 2018-05-02 13:26
+ */
+public class AccessBaseConnection {
+    private String uri;//数据库连接
+    private long createTime;// 时间戳
+    private Connection connection;// 链接对象
+
+    public AccessBaseConnection() {
+        // TODO Auto-generated constructor stub
+    }
+
+    /**
+     * 构造函数
+     * @param uri
+     * @param createTime
+     * @param connection
+     */
+    public AccessBaseConnection(String uri, long createTime, Connection connection) {
+        this.uri = uri;
+        this.createTime = createTime;
+        this.connection = connection;
+    }
+
+    /**
+     * 重置连接uri，并且同时会刷新连接对象
+     * @param uri
+     */
+    public boolean resetUri(String uri){
+        try {
+            this.uri = uri;
+            this.createTime = AccessUtils.getNowStamp();
+            if(AccessBaseConnectionFactory.USE_SELF_INNER_CONFIG){
+                this.connection = DriverManager.getConnection(uri, AccessConfig.getConfigProperties());
+            }else {
+                this.connection = DriverManager.getConnection(uri);
+            }
+            return true;
+        } catch (SQLException e) {
+            AccessLogUtils.error("[resetUri]重置连接对象失败！",e);
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * 刷新连接对象
+     * @return
+     */
+    public boolean refreshConnection(){
+        try {
+            this.createTime = AccessUtils.getNowStamp();
+            if(AccessBaseConnectionFactory.USE_SELF_INNER_CONFIG){
+                this.connection = DriverManager.getConnection(uri, AccessConfig.getConfigProperties());
+            }else {
+                this.connection = DriverManager.getConnection(uri);
+            }
+            return true;
+        } catch (SQLException e) {
+            AccessLogUtils.error("[refreshConnection]重新建立连接对象失败！",e);
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
+    public long getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(long createTime) {
+        this.createTime = createTime;
+    }
+
+    public Connection getConnection() {
+        if(null == this.connection){
+            try {
+                if(AccessBaseConnectionFactory.USE_SELF_INNER_CONFIG){
+                    this.connection = DriverManager.getConnection(uri, AccessConfig.getConfigProperties());
+                }else {
+                    this.connection = DriverManager.getConnection(uri);
+                }
+            } catch (SQLException e) {
+                AccessLogUtils.error("连接建立失败！",e);
+                e.printStackTrace();
+            }
+        }
+        return connection;
+    }
+
+    public void setConnection(Connection connection) {
+        this.connection = connection;
+    }
+}

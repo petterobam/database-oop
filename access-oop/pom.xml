@@ -24,15 +24,6 @@
     </properties>
 
     <dependencies>
-        <!-- http://www.hxtt.com/access.zip -->
-        <dependency>
-            <groupId>com.hxtt</groupId>
-            <artifactId>jdbc-access-hxtt</artifactId>
-            <version>30</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/libs/Access_JDBC30.jar</systemPath>
-        </dependency>
-
         <!-- 用于生成或操作加密库文件 https://mvnrepository.com/artifact/com.healthmarketscience.jackcess/jackcess-encrypt -->
         <!-- jdbc:ucanaccess:///opt/prova1.mny;jackcessOpener=yourPackage.example.CryptCodecOpener -->
         <dependency>

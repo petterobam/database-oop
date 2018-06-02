@@ -1,6 +1,13 @@
-该方式需要安装对应的软件服务端，建立数据库，用数据库名来连接，无法做到自动建库
+http://www.hxtt.com/access.zip
 
-属于一种服务形式，不符合 access 在我心中文档数据库的概念，故弃用
+这种方式最大限制就是，一般的驱动文件都是试用版的，一次不能超过50次查询，报错如下：
+
+```
+java.sql.SQLFeatureNotSupportedException: HXTT Access Version 5.1 For Evaluation Purpose allows executing not more than 50 queries once.
+```
+
+够买正式版的则很贵了，所以一般就不采用这种方式了
+
 
 ```Maven```依赖：
 

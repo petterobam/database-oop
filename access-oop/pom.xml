@@ -41,7 +41,6 @@
 
         <!-- http://ucanaccess.sourceforge.net/site.html#examples -->
         <!-- net.ucanaccess.jdbc.UcanaccessDriver jdbc:ucanaccess://c:/data/pippo.mdb;memory=false -->
-
         <dependency>
             <groupId>net.sf.ucanaccess</groupId>
             <artifactId>ucanaccess</artifactId>

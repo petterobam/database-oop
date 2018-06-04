@@ -51,7 +51,8 @@ public class AccessDatabaseUtils {
                 dbd.setAutoSync(false);
                 dbd.setFileFormat(fileFormat);
                 dbd.setReadOnly(false);
-                if (!AccessUtils.isBlank(password)) {
+                if (fileFormat == Database.FileFormat.MSISAM) {
+                    password = AccessUtils.isBlank(password) ? AccessConfig.getPassword() : password;
                     dbd.setCodecProvider(new CryptCodecProvider(password));
                 }
                 db = dbd.create();

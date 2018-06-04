@@ -18,9 +18,10 @@ public class AccessBaseConnection {
     private String uri;//数据库连接
     private long createTime;// 时间戳
     private Connection connection;// 链接对象
+    private boolean crypt;// 是否加密库
 
     public AccessBaseConnection() {
-        // TODO Auto-generated constructor stub
+
     }
 
     /**
@@ -30,7 +31,7 @@ public class AccessBaseConnection {
      * @param connection
      */
     public AccessBaseConnection(String uri, long createTime, Connection connection) {
-        this.uri = uri;
+        this.setUriAndLoderConfig(uri);
         this.createTime = createTime;
         this.connection = connection;
     }
@@ -40,20 +41,8 @@ public class AccessBaseConnection {
      * @param uri
      */
     public boolean resetUri(String uri){
-        try {
-            this.uri = uri;
-            this.createTime = AccessUtils.getNowStamp();
-            if(AccessBaseConnectionFactory.USE_SELF_INNER_CONFIG){
-                this.connection = DriverManager.getConnection(uri, AccessConfig.getConfigProperties());
-            }else {
-                this.connection = DriverManager.getConnection(uri);
-            }
-            return true;
-        } catch (SQLException e) {
-            AccessLogUtils.error("[resetUri]重置连接对象失败！",e);
-            e.printStackTrace();
-            return false;
-        }
+        this.setUriAndLoderConfig(uri);
+        return this.refreshConnection();
     }
 
     /**
@@ -63,10 +52,14 @@ public class AccessBaseConnection {
     public boolean refreshConnection(){
         try {
             this.createTime = AccessUtils.getNowStamp();
-            if(AccessBaseConnectionFactory.USE_SELF_INNER_CONFIG){
-                this.connection = DriverManager.getConnection(uri, AccessConfig.getConfigProperties());
+            if(crypt){
+                this.connection = DriverManager.getConnection(uri, AccessConfig.getUserName(),AccessConfig.getPassword());
             }else {
-                this.connection = DriverManager.getConnection(uri);
+                if (AccessBaseConnectionFactory.USE_SELF_INNER_CONFIG) {
+                    this.connection = DriverManager.getConnection(uri, AccessConfig.getConnectProperties());
+                } else {
+                    this.connection = DriverManager.getConnection(uri);
+                }
             }
             return true;
         } catch (SQLException e) {
@@ -76,12 +69,28 @@ public class AccessBaseConnection {
         }
     }
 
-    public String getUri() {
-        return uri;
+    /**
+     * 设置uri并且加载配置
+     * @param uri
+     */
+    public void setUriAndLoderConfig(String uri) {
+        this.uri = uri;
+        if(this.uri != null && this.uri.toLowerCase().endsWith(".mny")){
+            this.crypt = true;
+            if(AccessBaseConnectionFactory.USE_SELF_INNER_CONFIG){
+                this.uri = AccessConfig.getConnectUriWithProperties(this.uri);
+            }else {
+                this.uri = AccessConfig.getConnectUriWithDefaulCryptProperties(this.uri);
+            }
+        }else {
+            if(!AccessBaseConnectionFactory.USE_SELF_INNER_CONFIG){
+                this.uri = AccessConfig.getConnectUriWithDefaultProperties(this.uri);
+            }
+        }
     }
 
-    public void setUri(String uri) {
-        this.uri = uri;
+    public String getUri() {
+        return uri;
     }
 
     public long getCreateTime() {
@@ -94,21 +103,20 @@ public class AccessBaseConnection {
 
     public Connection getConnection() {
         if(null == this.connection){
-            try {
-                if(AccessBaseConnectionFactory.USE_SELF_INNER_CONFIG){
-                    this.connection = DriverManager.getConnection(uri, AccessConfig.getConfigProperties());
-                }else {
-                    this.connection = DriverManager.getConnection(uri);
-                }
-            } catch (SQLException e) {
-                AccessLogUtils.error("连接建立失败！",e);
-                e.printStackTrace();
-            }
+            this.refreshConnection();
         }
         return connection;
     }
 
     public void setConnection(Connection connection) {
         this.connection = connection;
+    }
+
+    public boolean isCrypt() {
+        return crypt;
+    }
+
+    public void setCrypt(boolean crypt) {
+        this.crypt = crypt;
     }
 }

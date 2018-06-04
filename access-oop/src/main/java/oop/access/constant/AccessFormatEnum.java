@@ -16,7 +16,7 @@ public enum AccessFormatEnum {
     V2007(Database.FileFormat.V2007),
     V2010(Database.FileFormat.V2010),
     V2016(Database.FileFormat.V2016),
-    MSISAM(Database.FileFormat.MSISAM);
+    MSISAM(Database.FileFormat.MSISAM);//加密库
 
     /**
      * 文件版本格式

@@ -252,7 +252,7 @@ public class AccessBaseConnectionFactory {
      */
     private static String getJDBCStr(String dbPath) {
         if(null != dbPath && !dbPath.startsWith("jdbc:ucanaccess")) {
-            String JDBC = new StringBuffer("jdbc:ucanaccess://").append(dbPath).append(";openExclusive=true;ignoreCase=true").toString();
+            String JDBC = "jdbc:ucanaccess://" + dbPath;
             return JDBC;
         }else {
             return dbPath;

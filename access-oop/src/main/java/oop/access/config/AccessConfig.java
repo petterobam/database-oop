@@ -25,14 +25,7 @@ public class AccessConfig {
      * 启动程序的时候读取properties配置文件信息，并永久缓存
      */
     static {
-        try {
-            //使用 properties 配置文件，默认在 config/access.properties 目录下面，若该项目被引用，启动项目只需要在相同目录下相同配置文件覆盖即可生效
-            properties.load(AccessConfig.class.getClassLoader().getResourceAsStream("config/access.properties"));
-            //properties.loadFromXML(AccessConfig.class.getClassLoader().getResourceAsStream("config/access.xml"));
-            loadConnectProperties(properties);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        loadConfig("config/access.properties");
     }
 
     /**
@@ -41,6 +34,7 @@ public class AccessConfig {
      * @param properties
      */
     private static void loadConnectProperties(Properties properties) {
+        connectProperties.clear();
         // 是否打开扩展功能
         String openExclusive = properties.getProperty("openExclusive");
         // 是否忽略SQL语句的大小写
@@ -150,6 +144,7 @@ public class AccessConfig {
             //使用 properties 配置文件，默认在 config/access.properties 目录下面，若该项目被引用，启动项目只需要在相同目录下相同配置文件覆盖即可生效
             properties.load(AccessConfig.class.getClassLoader().getResourceAsStream(classPath));
             //properties.loadFromXML(AccessConfig.class.getClassLoader().getResourceAsStream("config/access.xml"));
+            loadConnectProperties(properties);
         } catch (IOException e) {
             e.printStackTrace();
             properties = new Properties();

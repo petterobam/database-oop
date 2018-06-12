@@ -87,6 +87,9 @@ public class EsMappingHelper {
      * @return
      */
     public String getMappingStr() {
+        if(EsUtils.isNotEmpty(this.mappingStr)){
+            return this.mappingStr;
+        }
         String mappingStr = null;
         EsMappingFile mappingFile = targetClass.getAnnotation(EsMappingFile.class);
         if (null != mappingFile) {
@@ -106,14 +109,14 @@ public class EsMappingHelper {
                     EsTransient esTransient = field.getAnnotation(EsTransient.class);
                     if (null != esTransient) {
                         // EsTransient注解标记的属性即不存储也不做索引建立，无关字段
-                        mapping.field("enabled", false).field("doc_values", false).field("store", false);
+                        mapping.field("type","text")/*.field("enabled", false)*/.field("doc_values", false).field("store", false);
                     } else {
                         EsFieldsJson esfieldsJson = field.getAnnotation(EsFieldsJson.class);
                         EsFields esfields = field.getAnnotation(EsFields.class);
                         if (null != esfieldsJson) {
-                            putFileds(mapping,esfieldsJson);
+                            putFileds(mapping, esfieldsJson);
                         } else if (null != esfields) {
-                            putFileds(mapping,esfields);
+                            putFileds(mapping, esfields);
                         } else {
                             mapping.field("type", "keyword").field("store", true);
                         }
@@ -127,11 +130,13 @@ public class EsMappingHelper {
                 return mappingStr;
             }
         }
+        EsLogUtils.info("生成的Mapping为 {}", mappingStr);
         return mappingStr;
     }
 
     /**
      * 填充 EsFieldsJson 注解里面所有的Fields到对应属性里面
+     *
      * @param mapping
      * @param esFieldsJson
      * @throws IOException
@@ -144,8 +149,10 @@ public class EsMappingHelper {
             }
         }
     }
+
     /**
      * 填充 EsFields 注解里面所有的Fields到对应属性里面
+     *
      * @param mapping
      * @param esfields
      * @throws IOException

@@ -317,8 +317,8 @@ public class EsBaseService<T extends EsBaseEntity> {
     /**
      * Map方式写入Es
      *
-     * @param id    需要插入的对象ID
-     * @param o     需要插入的对象
+     * @param id 需要插入的对象ID
+     * @param o  需要插入的对象
      * @return 返回插入结果
      */
     public BulkResponse bulkInsert(String id, T o) {
@@ -402,14 +402,15 @@ public class EsBaseService<T extends EsBaseEntity> {
     /**
      * 根据id查询
      *
-     * @param id  类型
+     * @param id 类型
      * @return 返回查询得到的
      */
     public T searchById(String id) {
-        String json = this.searchById(this.index,this.type,id);
-        T result = EsJsonUtils.getObject(json,this.targetClass);
+        String json = this.searchById(this.index, this.type, id);
+        T result = EsJsonUtils.getObject(json, this.targetClass);
         return result;
     }
+
     /**
      * 根据id查询
      *
@@ -418,7 +419,7 @@ public class EsBaseService<T extends EsBaseEntity> {
      * @param type  类型
      * @return 返回查询得到的
      */
-    public String searchById(String index, String type,String id) {
+    public String searchById(String index, String type, String id) {
         String jsonString = null;
         try {
             GetResponse response = getRequest()
@@ -437,7 +438,6 @@ public class EsBaseService<T extends EsBaseEntity> {
 
 
     /**
-     *
      * 条件分页查询，使用sql语法
      *
      * @param searchParam
@@ -446,7 +446,7 @@ public class EsBaseService<T extends EsBaseEntity> {
     public EsBasePage<T> findEsBasePage(EsBaseEntity searchParam) {
         searchParam.setIndex(this.index);
         searchParam.setType(this.index);
-        return this.findEsBasePage(searchParam,this.targetClass);
+        return this.findEsBasePage(searchParam, this.targetClass);
     }
 
     /**
@@ -526,8 +526,9 @@ public class EsBaseService<T extends EsBaseEntity> {
     public List<T> findList(EsBaseEntity searchParam) {
         searchParam.setIndex(this.index);
         searchParam.setType(this.index);
-        return this.findList(searchParam,this.targetClass);
+        return this.findList(searchParam, this.targetClass);
     }
+
     /**
      * 条件查询，使用 请求参数语法
      * 返回符合条件的全部数据使用prepareSearchScroll游标查询比设置from查询速度要快
@@ -619,8 +620,10 @@ public class EsBaseService<T extends EsBaseEntity> {
         IndicesExistsRequest request = new IndicesExistsRequest(index);
         IndicesExistsResponse response = getIndicesAdminClient().exists(request).actionGet();
         if (response != null && response.isExists()) {
+            EsLogUtils.info("{} 索引存在！", index);
             return true;
         }
+        EsLogUtils.info("{} 索引不存在！", index);
         return false;
     }
 
@@ -635,8 +638,10 @@ public class EsBaseService<T extends EsBaseEntity> {
         TypesExistsRequest request = new TypesExistsRequest(new String[]{indexName}, indexType);
         TypesExistsResponse response = getIndicesAdminClient().typesExists(request).actionGet();
         if (response != null) {
+            EsLogUtils.info("在 {} 索引中 {} 存在！", indexName, indexType);
             return response.isExists();
         }
+        EsLogUtils.info("在 {} 索引中 {} 不存在！", indexName, indexType);
         return false;
     }
 
@@ -648,7 +653,7 @@ public class EsBaseService<T extends EsBaseEntity> {
      * @param xContentBuilder mapping
      */
     public synchronized boolean createIndex(String index, String type, XContentBuilder xContentBuilder) {
-        if (isExistsType(index, type)) {
+        if (indexExists(index) && isExistsType(index, type)) {
             return true;
         }
         IndicesAdminClient adminClient = getIndicesAdminClient();
@@ -669,16 +674,19 @@ public class EsBaseService<T extends EsBaseEntity> {
      * @param source mapping
      */
     public synchronized boolean createIndex(String index, String type, String source) {
-        if (isExistsType(index, type)) {
+        if (indexExists(index) && isExistsType(index, type)) {
             return true;
         }
         IndicesAdminClient adminClient = getIndicesAdminClient();
+        EsLogUtils.info("开始创建索引{}的{}类型！",index,type);
         CreateIndexResponse response = adminClient.prepareCreate(index)
                 .setSettings(getSettings())
                 .addMapping(type, source, XContentFactory.xContentType(source)).execute().actionGet();
         if (null != response) {
+            EsLogUtils.info("创建成功！");
             return response.isAcknowledged();
         }
+        EsLogUtils.info("创建失败！");
         return false;
     }
 

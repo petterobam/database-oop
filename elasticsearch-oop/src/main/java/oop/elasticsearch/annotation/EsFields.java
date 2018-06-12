@@ -15,7 +15,7 @@ public @interface EsFields {
      * field类型
      * @return
      */
-    String type() default EsFieldType.STRING;
+    String type() default EsFieldType.KEYWORD;
 
     /**
      * 分析器类型

@@ -2,6 +2,7 @@ package oop.test.elasticsearch.entity;
 
 import oop.elasticsearch.annotation.EsDoc;
 import oop.elasticsearch.annotation.EsMappingFile;
+import oop.elasticsearch.base.EsBaseEntity;
 
 /**
  * 测试
@@ -11,7 +12,7 @@ import oop.elasticsearch.annotation.EsMappingFile;
  */
 @EsDoc(Index = "test1",Type = "indexType1")
 @EsMappingFile("test/mapping.json")
-public class TestMappingJsonFileBean {
+public class TestMappingJsonFileBean extends EsBaseEntity {
     /**
      * id
      */

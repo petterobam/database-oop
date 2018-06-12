@@ -1,5 +1,7 @@
 package oop.elasticsearch.utils;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import oop.elasticsearch.annotation.EsDoc;
 import oop.elasticsearch.annotation.EsFields;
 import oop.elasticsearch.annotation.EsFieldsJson;
@@ -11,6 +13,7 @@ import org.elasticsearch.common.xcontent.XContentFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.util.Map;
 
 /**
  * es索引mapping工具类
@@ -134,7 +137,12 @@ public class EsMappingHelper {
      * @throws IOException
      */
     private void putFileds(XContentBuilder mapping, EsFieldsJson esFieldsJson) throws IOException {
-
+        JSONObject fields = JSON.parseObject(esFieldsJson.value());
+        if (!fields.isEmpty()) {
+            for (Map.Entry<String, Object> field : fields.entrySet()) {
+                mapping.field(field.getKey(), field.getValue());
+            }
+        }
     }
     /**
      * 填充 EsFields 注解里面所有的Fields到对应属性里面

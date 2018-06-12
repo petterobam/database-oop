@@ -3,9 +3,13 @@ package oop.elasticsearch.base;
 import oop.elasticsearch.config.ElasticsearchConfig;
 import oop.elasticsearch.utils.EsJsonUtils;
 import oop.elasticsearch.utils.EsLogUtils;
+import oop.elasticsearch.utils.EsMappingHelper;
 import oop.elasticsearch.utils.EsUtils;
+import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
+import org.elasticsearch.action.admin.indices.exists.types.TypesExistsRequest;
+import org.elasticsearch.action.admin.indices.exists.types.TypesExistsResponse;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequestBuilder;
@@ -26,6 +30,7 @@ import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -51,25 +56,60 @@ import java.util.Map;
  *
  * @author 欧阳洁
  */
-public abstract class EsBaseService {
+public class EsBaseService<T extends EsBaseEntity> {
+    /**
+     * 设置默认索引分片个数
+     */
+    public static final int NUMBER_OF_SHARDS = 5;
+    /**
+     * 设置默认索引副本个数，默认为1个副本
+     */
+    public static final int NUMBER_OF_REPLICAS = 1;
+    /**
+     * 设置最大查询条数
+     */
+    public static final int MAX_RESULT_WINDOW = 50000000;
     /**
      * 服务
      */
     private TransportClient client;
+    /**
+     * 当前 Index
+     */
+    private String index;
+    /**
+     * 当前 Type
+     */
+    private String type;
+    /**
+     * 当前 Mapping
+     */
+    private String mapping;
+    /**
+     * 实体类对应的类
+     */
+    private Class<T> targetClass;
 
-    public EsBaseService(){
+    /**
+     * 继承时候使用的构造函数
+     */
+    public EsBaseService(Class<T> targetClass) {
+        this.targetClass = targetClass;
         this.client = ElasticsearchConfig.getClient();
-    }
-    public EsBaseService(TransportClient client){
-        this.client = client;
+        EsMappingHelper mappingHelper = new EsMappingHelper(targetClass);
+        this.index = mappingHelper.getIndex();
+        this.type = mappingHelper.getType();
+        this.mapping = mappingHelper.getMappingStr();
+        this.createIndex(this.index, this.type, mapping);
     }
 
     /**
      * 关闭client
      */
-    public void closeClient(){
+    public void closeClient() {
         client.close();
     }
+
     /**
      * 获取连接
      *
@@ -78,12 +118,13 @@ public abstract class EsBaseService {
     public TransportClient getClient() {
         return client;
     }
+
     /**
      * 设置连接，继承这个类必须要实现
      *
      * @param client
      */
-    public void setClient(TransportClient client){
+    public void setClient(TransportClient client) {
         this.client = client;
     }
 
@@ -147,12 +188,27 @@ public abstract class EsBaseService {
     }
 
     /**
+     * @return d
+     */
+    public IndexRequestBuilder indexDefaultRequest() {
+        return this.indexRequest(this.index, this.type);
+    }
+
+    /**
      * @param index d
      * @param type  d
      * @return d
      */
     public IndexRequestBuilder indexRequest(String index, String type) {
         return client.prepareIndex(index, type);
+    }
+
+    /**
+     * @param id d
+     * @return d
+     */
+    public IndexRequestBuilder indexRequest(String id) {
+        return this.indexRequest(this.index, this.type, id);
     }
 
     /**
@@ -173,6 +229,14 @@ public abstract class EsBaseService {
     }
 
     /**
+     * @param id d
+     * @return d
+     */
+    public UpdateRequestBuilder updateRequest(String id) {
+        return this.updateRequest(this.index, this.type, id);
+    }
+
+    /**
      * @param index d
      * @param type  d
      * @param id    d
@@ -190,12 +254,31 @@ public abstract class EsBaseService {
     }
 
     /**
+     * @return d
+     */
+    public SearchRequestBuilder searchDefaultRequest() {
+        return this.searchRequest(this.index, this.type);
+    }
+
+    /**
      * @param index d
      * @param type  d
      * @return d
      */
     public SearchRequestBuilder searchRequest(String index, String type) {
         return client.prepareSearch(index).setTypes(type);
+    }
+
+    /**
+     * mget多条件关联查询
+     *
+     * @param extraIndex d
+     * @param extraType  d
+     * @param id         关联id
+     * @return d
+     */
+    public MultiGetResponse searchRequestMulti(String extraIndex, String extraType, String id) {
+        return this.searchRequestMulti(this.index, this.type, extraIndex, extraType, id);
     }
 
     /**
@@ -210,7 +293,14 @@ public abstract class EsBaseService {
      */
     public MultiGetResponse searchRequestMulti(String index, String type, String index2, String type2, String id) {
         return client.prepareMultiGet().add(index, type, id).add(index2, type2, id).get();
+    }
 
+    /**
+     * @param id 需要删除对象ID
+     * @return 删除
+     */
+    public DeleteRequestBuilder deleteRequest(String id) {
+        return this.deleteRequest(this.index, this.type, id);
     }
 
     /**
@@ -223,6 +313,17 @@ public abstract class EsBaseService {
         return client.prepareDelete(index, type, id);
     }
 
+
+    /**
+     * Map方式写入Es
+     *
+     * @param id    需要插入的对象ID
+     * @param o     需要插入的对象
+     * @return 返回插入结果
+     */
+    public BulkResponse bulkInsert(String id, T o) {
+        return this.bulkInsert(this.index, this.type, id, o);
+    }
 
     /**
      * Map方式写入Es
@@ -301,12 +402,23 @@ public abstract class EsBaseService {
     /**
      * 根据id查询
      *
+     * @param id  类型
+     * @return 返回查询得到的
+     */
+    public T searchById(String id) {
+        String json = this.searchById(this.index,this.type,id);
+        T result = EsJsonUtils.getObject(json,this.targetClass);
+        return result;
+    }
+    /**
+     * 根据id查询
+     *
      * @param id    主键id
      * @param index 索引
      * @param type  类型
      * @return 返回查询得到的
      */
-    public String searchById(String id, String index, String type) {
+    public String searchById(String index, String type,String id) {
         String jsonString = null;
         try {
             GetResponse response = getRequest()
@@ -325,6 +437,19 @@ public abstract class EsBaseService {
 
 
     /**
+     *
+     * 条件分页查询，使用sql语法
+     *
+     * @param searchParam
+     * @return 分页对象
+     */
+    public EsBasePage<T> findEsBasePage(EsBaseEntity searchParam) {
+        searchParam.setIndex(this.index);
+        searchParam.setType(this.index);
+        return this.findEsBasePage(searchParam,this.targetClass);
+    }
+
+    /**
      * 条件分页查询，使用sql语法
      *
      * @param searchParam 查询条件
@@ -332,7 +457,7 @@ public abstract class EsBaseService {
      * @param <E>         对象类型
      * @return 分页对象信息
      */
-    public <E> EsBasePage<E> findEsBasePage(EsBaseParam searchParam, Class<E> clazz) {
+    public <E> EsBasePage<E> findEsBasePage(EsBaseEntity searchParam, Class<E> clazz) {
         if (searchParam == null) {
             return null;
         }
@@ -350,8 +475,8 @@ public abstract class EsBaseService {
         //设置查询分页条件
         search.setFrom(searchParam.getOffsetCurrent()).setSize(searchParam.getSize()).setExplain(true);
         //设置查询条件
-        if (EsUtils.isNotEmpty(searchParam.getSearchSql())) {
-            search.setQuery(QueryBuilders.queryStringQuery(searchParam.getSearchSql()));
+        if (EsUtils.isNotEmpty(searchParam.getSearchParam())) {
+            search.setQuery(QueryBuilders.queryStringQuery(searchParam.getSearchParam()));
         }
 
 
@@ -392,7 +517,19 @@ public abstract class EsBaseService {
 
 
     /**
-     * 条件查询，使用sql语法
+     * 条件查询，使用 请求参数语法
+     * 返回符合条件的全部数据使用prepareSearchScroll游标查询比设置from查询速度要快
+     *
+     * @param searchParam 查询条件
+     * @return List对象集合信息
+     */
+    public List<T> findList(EsBaseEntity searchParam) {
+        searchParam.setIndex(this.index);
+        searchParam.setType(this.index);
+        return this.findList(searchParam,this.targetClass);
+    }
+    /**
+     * 条件查询，使用 请求参数语法
      * 返回符合条件的全部数据使用prepareSearchScroll游标查询比设置from查询速度要快
      *
      * @param searchParam 查询条件
@@ -400,7 +537,7 @@ public abstract class EsBaseService {
      * @param <E>         对象类型
      * @return List对象集合信息
      */
-    public <E> List<E> findList(EsBaseParam searchParam, Class<E> clazz) {
+    public <E> List<E> findList(EsBaseEntity searchParam, Class<E> clazz) {
         if (searchParam == null) {
             return null;
         }
@@ -423,8 +560,8 @@ public abstract class EsBaseService {
         //设置这个游标维持多长时间
         search.setScroll(TimeValue.timeValueSeconds(scrollSeconds));
         //设置查询条件
-        if (EsUtils.isNotEmpty(searchParam.getSearchSql())) {
-            search.setQuery(QueryBuilders.queryStringQuery(searchParam.getSearchSql()));
+        if (EsUtils.isNotEmpty(searchParam.getSearchParam())) {
+            search.setQuery(QueryBuilders.queryStringQuery(searchParam.getSearchParam()));
         }
 
 
@@ -481,26 +618,27 @@ public abstract class EsBaseService {
     public synchronized boolean indexExists(String index) {
         IndicesExistsRequest request = new IndicesExistsRequest(index);
         IndicesExistsResponse response = getIndicesAdminClient().exists(request).actionGet();
-        if (response.isExists()) {
+        if (response != null && response.isExists()) {
             return true;
         }
         return false;
     }
 
     /**
-     * 设置默认索引分片个数
+     * 判断指定的索引的类型是否存在
+     *
+     * @param indexName 索引名
+     * @param indexType 索引类型
+     * @return 存在：true; 不存在：false;
      */
-    public static final int NUMBER_OF_SHARDS = 5;
-
-    /**
-     * 设置默认索引副本个数，默认为1个副本
-     */
-    public static final int NUMBER_OF_REPLICAS = 1;
-
-    /**
-     * 设置最大查询条数
-     */
-    public static final int MAX_RESULT_WINDOW = 50000000;
+    public boolean isExistsType(String indexName, String indexType) {
+        TypesExistsRequest request = new TypesExistsRequest(new String[]{indexName}, indexType);
+        TypesExistsResponse response = getIndicesAdminClient().typesExists(request).actionGet();
+        if (response != null) {
+            return response.isExists();
+        }
+        return false;
+    }
 
     /**
      * 创建索引
@@ -509,14 +647,39 @@ public abstract class EsBaseService {
      * @param type            表
      * @param xContentBuilder mapping
      */
-    public synchronized void createIndex(String index, String type, XContentBuilder xContentBuilder) {
-        if (indexExists(index)) {
-            return;
+    public synchronized boolean createIndex(String index, String type, XContentBuilder xContentBuilder) {
+        if (isExistsType(index, type)) {
+            return true;
         }
         IndicesAdminClient adminClient = getIndicesAdminClient();
-        adminClient.prepareCreate(index)
+        CreateIndexResponse response = adminClient.prepareCreate(index)
                 .setSettings(getSettings())
                 .addMapping(type, xContentBuilder).execute().actionGet();
+        if (null != response) {
+            return response.isAcknowledged();
+        }
+        return false;
+    }
+
+    /**
+     * 创建索引
+     *
+     * @param index  索引 数据库
+     * @param type   表
+     * @param source mapping
+     */
+    public synchronized boolean createIndex(String index, String type, String source) {
+        if (isExistsType(index, type)) {
+            return true;
+        }
+        IndicesAdminClient adminClient = getIndicesAdminClient();
+        CreateIndexResponse response = adminClient.prepareCreate(index)
+                .setSettings(getSettings())
+                .addMapping(type, source, XContentFactory.xContentType(source)).execute().actionGet();
+        if (null != response) {
+            return response.isAcknowledged();
+        }
+        return false;
     }
 
     public static Settings.Builder getSettings() {

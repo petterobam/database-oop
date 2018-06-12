@@ -3,13 +3,14 @@ package oop.test.elasticsearch.entity;
 import oop.elasticsearch.annotation.EsDoc;
 import oop.elasticsearch.annotation.EsFields;
 import oop.elasticsearch.annotation.EsTransient;
+import oop.elasticsearch.base.EsBaseEntity;
 
 /**
  * @author 欧阳洁
  * @since 2018-05-08 18:57
  */
 @EsDoc(Index = "test2",Type = "indexType2")
-public class TestMappingFieldsBean {
+public class TestMappingFieldsBean extends EsBaseEntity {
     /**
      * id
      */

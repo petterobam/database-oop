@@ -6,46 +6,45 @@ package oop.elasticsearch.base;
  *
  * @author 欧阳洁
  */
-public class EsBaseParam {
+public class EsBaseEntity {
 
     /**
      * 索引名称
      */
     private String index;
-
     /**
      * 索引类型
      */
     private String type;
-
     /**
      * 排序条件
      */
     private String orderByField;
-
     /**
-     * 查询条件Sql
-     *
+     * Get 请求参数查询 参数
+     * <p>
      * 例如："id":"10" AND "zcmc":"测试"
      * (zcmc:*6* OR zcmc:*2*) AND dsld:[10 TO 18]
      */
-    private String searchSql;
-
+    private String searchParam;
+    /**
+     * POST 请求体查询 请求体 Json
+     * <p>
+     * 例如：{"query": {"bool": {"must": [{"match": {"name": "测试"}}]}}}
+     */
+    private String searchBody;
     /**
      * 指定需要返回的字段名称（为空返回所有）
      */
     private String[] includes;
-
     /**
      * 指定不需要返回的字段名称
      */
     private String[] excludes;
-
     /**
      * 开始页数(从1开始)
      */
     private int current;
-
     /**
      * 每页条数
      */
@@ -59,12 +58,20 @@ public class EsBaseParam {
         this.orderByField = orderByField;
     }
 
-    public String getSearchSql() {
-        return searchSql;
+    public String getSearchParam() {
+        return searchParam;
     }
 
-    public void setSearchSql(String searchSql) {
-        this.searchSql = searchSql;
+    public void setSearchParam(String searchParam) {
+        this.searchParam = searchParam;
+    }
+
+    public String getSearchBody() {
+        return searchBody;
+    }
+
+    public void setSearchBody(String searchBody) {
+        this.searchBody = searchBody;
     }
 
     public int getCurrent() {

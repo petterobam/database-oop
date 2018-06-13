@@ -1,6 +1,8 @@
 package oop.elasticsearch.base;
 
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 /**
  * ElasticSearch查询条件封装基础Bean
  *
@@ -11,14 +13,17 @@ public class EsBaseEntity {
     /**
      * 索引名称
      */
+    @JSONField(serialize=false)
     private String index;
     /**
      * 索引类型
      */
+    @JSONField(serialize=false)
     private String type;
     /**
      * 排序条件
      */
+    @JSONField(serialize=false)
     private String orderByField;
     /**
      * Get 请求参数查询 参数
@@ -26,29 +31,35 @@ public class EsBaseEntity {
      * 例如："id":"10" AND "zcmc":"测试"
      * (zcmc:*6* OR zcmc:*2*) AND dsld:[10 TO 18]
      */
+    @JSONField(serialize=false)
     private String searchParam;
     /**
      * POST 请求体查询 请求体 Json
      * <p>
      * 例如：{"query": {"bool": {"must": [{"match": {"name": "测试"}}]}}}
      */
+    @JSONField(serialize=false)
     private String searchBody;
     /**
      * 指定需要返回的字段名称（为空返回所有）
      */
+    @JSONField(serialize=false)
     private String[] includes;
     /**
      * 指定不需要返回的字段名称
      */
+    @JSONField(serialize=false)
     private String[] excludes;
     /**
      * 开始页数(从1开始)
      */
+    @JSONField(serialize=false)
     private int current;
     /**
      * 每页条数
      */
-    private int size;
+    @JSONField(serialize=false)
+    private int size = 1000;
 
     public String getOrderByField() {
         return orderByField;
@@ -133,6 +144,7 @@ public class EsBaseEntity {
         return current > 0 ? (current - 1) * size : 0;
     }
 
+    @JSONField(serialize = false)
     public int getOffsetCurrent() {
         return offsetCurrent(this.current, this.size);
     }

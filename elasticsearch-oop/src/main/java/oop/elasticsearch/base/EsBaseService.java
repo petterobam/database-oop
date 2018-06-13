@@ -13,18 +13,18 @@ import org.elasticsearch.action.admin.indices.exists.types.TypesExistsResponse;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequestBuilder;
-import org.elasticsearch.action.get.GetRequestBuilder;
+import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.action.get.MultiGetRequestBuilder;
 import org.elasticsearch.action.get.MultiGetResponse;
 import org.elasticsearch.action.index.IndexRequestBuilder;
-import org.elasticsearch.action.search.ClearScrollRequestBuilder;
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.MultiSearchRequestBuilder;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchScrollRequestBuilder;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.action.update.UpdateRequestBuilder;
+import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
@@ -39,6 +39,7 @@ import org.elasticsearch.index.reindex.DeleteByQueryAction;
 import org.elasticsearch.index.reindex.DeleteByQueryRequestBuilder;
 import org.elasticsearch.index.reindex.UpdateByQueryAction;
 import org.elasticsearch.index.reindex.UpdateByQueryRequestBuilder;
+import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -47,9 +48,11 @@ import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * 自定义elasticsearch连接和操作基础服务
@@ -89,6 +92,10 @@ public class EsBaseService<T extends EsBaseEntity> {
      * 实体类对应的类
      */
     private Class<T> targetClass;
+    /**
+     * id 属性
+     */
+    private Field idField;
 
     /**
      * 继承时候使用的构造函数
@@ -100,6 +107,7 @@ public class EsBaseService<T extends EsBaseEntity> {
         this.index = mappingHelper.getIndex();
         this.type = mappingHelper.getType();
         this.mapping = mappingHelper.getMappingStr();
+        idField = mappingHelper.getIdField();
         this.createIndex(this.index, this.type, mapping);
     }
 
@@ -140,27 +148,6 @@ public class EsBaseService<T extends EsBaseEntity> {
     /**
      * @return d
      */
-    public BulkRequestBuilder bulkRequest() {
-        return client.prepareBulk();
-    }
-
-    /**
-     * @return d
-     */
-    public GetRequestBuilder getRequest() {
-        return client.prepareGet();
-    }
-
-    /**
-     * @return d
-     */
-    public MultiGetRequestBuilder multiGetRequest() {
-        return client.prepareMultiGet();
-    }
-
-    /**
-     * @return d
-     */
     public MultiSearchRequestBuilder multiSearchRequest() {
         return client.prepareMultiSearch();
     }
@@ -174,33 +161,50 @@ public class EsBaseService<T extends EsBaseEntity> {
     }
 
     /**
-     * @return d
+     * 通过ID查询 IndexResponse
+     *
+     * @param _id
+     * @return
      */
-    public ClearScrollRequestBuilder clearScrollRequest() {
-        return client.prepareClearScroll();
+    public IndexResponse insert(String _id, String source) {
+        EsLogUtils.info("执行新增 {}/{}?{}", this.index, this.type, source);
+        return this.indexRequest().setId(_id).setSource(source, XContentType.JSON).execute().actionGet();
+    }
+
+    /**
+     * 通过ID插入 IndexResponse
+     *
+     * @param _id
+     * @return
+     */
+    public boolean insert(String _id, T entity) {
+        String json = EsJsonUtils.toJSONString(entity);
+        IndexResponse response = this.insert(_id, json);
+        if (null != response) {
+            RestStatus restStatus = response.status();
+            return RestStatus.CREATED.equals(restStatus) || RestStatus.OK.equals(restStatus);
+        }
+        return false;
+    }
+
+    /**
+     * 通过ID插入 IndexResponse
+     *
+     * @return
+     */
+    public boolean insert(T entity) {
+        String id = EsUtils.toString(readIdField(entity));
+        if (EsUtils.isBlank(id)) {
+            id = UUID.randomUUID().toString();
+        }
+        return this.insert(id, entity);
     }
 
     /**
      * @return d
      */
     public IndexRequestBuilder indexRequest() {
-        return client.prepareIndex();
-    }
-
-    /**
-     * @return d
-     */
-    public IndexRequestBuilder indexDefaultRequest() {
         return this.indexRequest(this.index, this.type);
-    }
-
-    /**
-     * @param index d
-     * @param type  d
-     * @return d
-     */
-    public IndexRequestBuilder indexRequest(String index, String type) {
-        return client.prepareIndex(index, type);
     }
 
     /**
@@ -214,18 +218,20 @@ public class EsBaseService<T extends EsBaseEntity> {
     /**
      * @param index d
      * @param type  d
+     * @return d
+     */
+    public IndexRequestBuilder indexRequest(String index, String type) {
+        return client.prepareIndex(index, type);
+    }
+
+    /**
+     * @param index d
+     * @param type  d
      * @param id    d
      * @return d
      */
     public IndexRequestBuilder indexRequest(String index, String type, String id) {
         return client.prepareIndex(index, type, id);
-    }
-
-    /**
-     * @return d
-     */
-    public UpdateRequestBuilder updateRequest() {
-        return client.prepareUpdate();
     }
 
     /**
@@ -247,16 +253,49 @@ public class EsBaseService<T extends EsBaseEntity> {
     }
 
     /**
-     * @return d
+     * 通过ID查询 IndexResponse
+     *
+     * @param _id
+     * @return
      */
-    public SearchRequestBuilder searchRequest() {
-        return client.prepareSearch();
+    public UpdateResponse upsert(String _id, String source) {
+        EsLogUtils.info("执行增改 {}/{}?{}", this.index, this.type, source);
+        return this.updateRequest(_id).setDoc(source, XContentType.JSON).setUpsert(source, XContentType.JSON).execute().actionGet();
+    }
+
+    /**
+     * 通过ID插入 IndexResponse
+     *
+     * @param _id
+     * @return
+     */
+    public boolean upsert(String _id, T entity) {
+        String json = EsJsonUtils.toJSONString(entity);
+        UpdateResponse response = this.upsert(_id, json);
+        if (null != response) {
+            RestStatus restStatus = response.status();
+            return RestStatus.CREATED.equals(restStatus) || RestStatus.OK.equals(restStatus);
+        }
+        return false;
+    }
+
+    /**
+     * 通过ID插入 IndexResponse
+     *
+     * @return
+     */
+    public boolean upsert(T entity) {
+        String id = EsUtils.toString(readIdField(entity));
+        if (EsUtils.isBlank(id)) {
+            id = UUID.randomUUID().toString();
+        }
+        return this.upsert(id, entity);
     }
 
     /**
      * @return d
      */
-    public SearchRequestBuilder searchDefaultRequest() {
+    public SearchRequestBuilder searchRequest() {
         return this.searchRequest(this.index, this.type);
     }
 
@@ -313,6 +352,15 @@ public class EsBaseService<T extends EsBaseEntity> {
         return client.prepareDelete(index, type, id);
     }
 
+    public boolean deleteById(String _id) {
+        EsLogUtils.info("执行删除 {}/{}/{}", this.index, this.type, _id);
+        DeleteResponse response = this.deleteRequest(_id).execute().actionGet();
+        if (null != response) {
+            RestStatus restStatus = response.status();
+            return RestStatus.OK.equals(restStatus);
+        }
+        return false;
+    }
 
     /**
      * Map方式写入Es
@@ -335,7 +383,7 @@ public class EsBaseService<T extends EsBaseEntity> {
      * @return 返回插入结果
      */
     public BulkResponse bulkInsert(String index, String type, String id, Object o) {
-        BulkRequestBuilder bulkRequest = bulkRequest();
+        BulkRequestBuilder bulkRequest = client.prepareBulk();
         bulkRequest.add(bulkInsertAdd(index, type, id, o));
         return bulkRequest.execute().actionGet();
     }
@@ -350,9 +398,8 @@ public class EsBaseService<T extends EsBaseEntity> {
      * @return 返回索引插入对象
      */
     public IndexRequestBuilder bulkInsertAdd(String index, String type, String id, Object o) {
-        Map map = null;
         if (o instanceof Map) {
-            return indexRequest(index, type, id).setSource(map);
+            return indexRequest(index, type, id).setSource(o);
         } else {
             String json = "";
             if (o instanceof String) {
@@ -422,7 +469,7 @@ public class EsBaseService<T extends EsBaseEntity> {
     public String searchById(String index, String type, String id) {
         String jsonString = null;
         try {
-            GetResponse response = getRequest()
+            GetResponse response = client.prepareGet()
                     .setId(id)
                     .setIndex(index)
                     .setType(type)
@@ -515,6 +562,76 @@ public class EsBaseService<T extends EsBaseEntity> {
         return page;
     }
 
+    /**
+     * 通过ID查找到对象
+     *
+     * @param _id
+     * @return
+     */
+    public T getById(String _id) {
+        SearchRequestBuilder srb = this.searchRequest();
+        srb.setQuery(QueryBuilders.termQuery("_id", _id));
+        try {
+            SearchResponse response = srb.execute().actionGet();
+            if (null == response) {
+                EsLogUtils.info("查询异常，未接收到返回！");
+                return null;
+            }
+            SearchHits searchHits = response.getHits();
+            if (null != searchHits && searchHits.getTotalHits() > 0) {
+                SearchHit searchHit = searchHits.getHits()[0];
+                String jsonStr = searchHit.getSourceAsString();
+                T result = EsJsonUtils.getObject(jsonStr, this.targetClass);
+                return result;
+            }
+        } catch (Exception e) {
+            EsLogUtils.info("查询异常！", e);
+        }
+        return null;
+    }
+
+    /**
+     * 通过ID查找到对象
+     *
+     * @param entity
+     * @return
+     */
+    public List<T> query(T entity) {
+        EsLogUtils.info("执行查询 {}/{} 开始！", this.index, this.type);
+        SearchRequestBuilder srb = this.searchRequest();
+        srb.setSize(entity.getSize());
+        srb.setFrom(entity.getOffsetCurrent());
+        //设置查询条件
+        if (EsUtils.isNotEmpty(entity.getSearchParam())) {
+            // Get 参数查询方式
+            EsLogUtils.info("Get 参数查询方式 参数为 {}", entity.getSearchParam());
+            srb.setQuery(QueryBuilders.queryStringQuery(entity.getSearchParam()));
+        } else {
+            // 将 searchBody 转化为 QueryBuilder 对象
+        }
+        List<T> result = new ArrayList<T>();
+        try {
+            SearchResponse response = srb.execute().actionGet();
+            if (null == response) {
+                EsLogUtils.info("查询异常，未接收到返回！");
+                return null;
+            }
+            SearchHits searchHits = response.getHits();
+            if (null != searchHits && searchHits.getTotalHits() > 0) {
+                for (SearchHit searchHit : searchHits.getHits()) {
+                    String jsonStr = searchHit.getSourceAsString();
+                    EsLogUtils.info("查询到： {}", jsonStr);
+                    T item = EsJsonUtils.getObject(jsonStr, this.targetClass);
+                    result.add(item);
+                }
+            }
+        } catch (Exception e) {
+            EsLogUtils.info("查询异常！", e);
+        }
+        EsLogUtils.info("执行查询 {}/{} 结束！", this.index, this.type);
+        return result;
+    }
+
 
     /**
      * 条件查询，使用 请求参数语法
@@ -565,7 +682,6 @@ public class EsBaseService<T extends EsBaseEntity> {
             search.setQuery(QueryBuilders.queryStringQuery(searchParam.getSearchParam()));
         }
 
-
         final int two = 2;
         //设置排序方式
         if (EsUtils.isNotEmpty(searchParam.getOrderByField())) {
@@ -602,7 +718,9 @@ public class EsBaseService<T extends EsBaseEntity> {
             sum += hits.getHits().length;
             if (null != hits && hits.getHits().length > 0) {
                 for (SearchHit hit : hits) {
-                    list.add(EsJsonUtils.getObject(hit.getSourceAsString(), clazz));
+                    String source = hit.getSourceAsString();
+                    EsLogUtils.info("查询到： {}", source);
+                    list.add(EsJsonUtils.getObject(source, clazz));
                 }
             }
         } while (sum < count);
@@ -678,7 +796,7 @@ public class EsBaseService<T extends EsBaseEntity> {
             return true;
         }
         IndicesAdminClient adminClient = getIndicesAdminClient();
-        EsLogUtils.info("开始创建索引{}的{}类型！",index,type);
+        EsLogUtils.info("开始创建索引{}的{}类型！", index, type);
         CreateIndexResponse response = adminClient.prepareCreate(index)
                 .setSettings(getSettings())
                 .addMapping(type, source, XContentFactory.xContentType(source)).execute().actionGet();
@@ -688,6 +806,23 @@ public class EsBaseService<T extends EsBaseEntity> {
         }
         EsLogUtils.info("创建失败！");
         return false;
+    }
+
+    /**
+     * 读取属性的值
+     *
+     * @param target
+     * @return
+     */
+    protected Object readIdField(T target) {
+        if (this.idField == null) {
+            return null;
+        }
+        try {
+            return EsUtils.readField(this.idField, target, true);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static Settings.Builder getSettings() {

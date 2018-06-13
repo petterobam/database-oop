@@ -4,6 +4,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.lang.reflect.Modifier;
 
 public class EsUtils {
     public static boolean isEmpty(CharSequence cs) {
@@ -14,6 +18,15 @@ public class EsUtils {
         return !isEmpty(cs);
     }
 
+    /**
+     * 判断字符串是否为空
+     *
+     * @param str
+     * @return
+     */
+    public static String toString(Object str) {
+        return str == null ? null : str.toString();
+    }
     /**
      * 判断字符串是否为空
      *
@@ -73,5 +86,48 @@ public class EsUtils {
             }
         }
         return sb.toString();
+    }
+
+    /**
+     * 读取对象的某个注解属性值
+     *
+     * @param field
+     * @param target
+     * @param forceAccess
+     * @return
+     * @throws IllegalAccessException
+     */
+    public static Object readField(final Field field, final Object target, final boolean forceAccess) throws IllegalAccessException {
+        if (field == null) {
+            return null;
+        }
+        if (forceAccess && !field.isAccessible()) {
+            field.setAccessible(true);
+        } else {
+            EsUtils.setAccessibleWorkaround(field);
+        }
+        return field.get(target);
+    }
+
+    static boolean setAccessibleWorkaround(final AccessibleObject o) {
+        if (o == null || o.isAccessible()) {
+            return false;
+        }
+        final Member m = (Member) o;
+        if (!o.isAccessible() && Modifier.isPublic(m.getModifiers()) && isPackageAccess(m.getDeclaringClass().getModifiers())) {
+            try {
+                o.setAccessible(true);
+                return true;
+            } catch (final SecurityException e) { // NOPMD
+                // ignore in favor of subsequent IllegalAccessException
+            }
+        }
+        return false;
+    }
+
+    private static final int ACCESS_TEST = Modifier.PUBLIC | Modifier.PROTECTED | Modifier.PRIVATE;
+
+    static boolean isPackageAccess(final int modifiers) {
+        return (modifiers & ACCESS_TEST) == 0;
     }
 }

@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import oop.elasticsearch.annotation.EsDoc;
 import oop.elasticsearch.annotation.EsFields;
 import oop.elasticsearch.annotation.EsFieldsJson;
+import oop.elasticsearch.annotation.EsId;
 import oop.elasticsearch.annotation.EsMappingFile;
 import oop.elasticsearch.annotation.EsTransient;
 import org.elasticsearch.common.xcontent.XContentBuilder;
@@ -38,26 +39,10 @@ public class EsMappingHelper {
      * mapping 字符串
      */
     private String mappingStr;
-
-    public void setMappingStr(String mappingStr) {
-        this.mappingStr = mappingStr;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getIndex() {
-        return index;
-    }
-
-    public void setIndex(String index) {
-        this.index = index;
-    }
+    /**
+     * id 属性
+     */
+    private Field idField;
 
     /**
      * 构造函数
@@ -105,6 +90,9 @@ public class EsMappingHelper {
                 XContentBuilder mapping = XContentFactory.jsonBuilder().startObject().startObject(this.type);
                 mapping.startObject("properties");
                 for (Field field : fieldArray) {
+                    if(null == idField && field.getAnnotation(EsId.class) != null){
+                        this.idField = field;
+                    }
                     mapping.startObject(field.getName());
                     EsTransient esTransient = field.getAnnotation(EsTransient.class);
                     if (null != esTransient) {
@@ -293,5 +281,33 @@ public class EsMappingHelper {
         if (!EsUtils.isBlank(esfields.term_vector())) {
             mapping.field("term_vector", esfields.term_vector());
         }
+    }
+
+    public void setMappingStr(String mappingStr) {
+        this.mappingStr = mappingStr;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getIndex() {
+        return index;
+    }
+
+    public void setIndex(String index) {
+        this.index = index;
+    }
+
+    public Field getIdField() {
+        return idField;
+    }
+
+    public void setIdField(Field idField) {
+        this.idField = idField;
     }
 }

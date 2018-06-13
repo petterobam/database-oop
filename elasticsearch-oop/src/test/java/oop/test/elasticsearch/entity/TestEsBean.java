@@ -2,6 +2,8 @@ package oop.test.elasticsearch.entity;
 
 import oop.elasticsearch.annotation.EsDoc;
 import oop.elasticsearch.annotation.EsFields;
+import oop.elasticsearch.annotation.EsFieldsJson;
+import oop.elasticsearch.annotation.EsId;
 import oop.elasticsearch.annotation.EsTransient;
 import oop.elasticsearch.base.EsBaseEntity;
 
@@ -9,11 +11,12 @@ import oop.elasticsearch.base.EsBaseEntity;
  * @author 欧阳洁
  * @since 2018-05-08 18:57
  */
-@EsDoc(Index = "test2",Type = "indexType2")
-public class TestMappingFieldsBean extends EsBaseEntity {
+@EsDoc(Index = "my_index",Type = "my_type")
+public class TestEsBean extends EsBaseEntity {
     /**
      * id
      */
+    @EsId
     @EsFields(boost = 5.0)
     private String id;
     /**
@@ -23,6 +26,7 @@ public class TestMappingFieldsBean extends EsBaseEntity {
     /**
      * article
      */
+    @EsFieldsJson("{'type': 'text','store': true}")
     private String article;
     /**
      * article

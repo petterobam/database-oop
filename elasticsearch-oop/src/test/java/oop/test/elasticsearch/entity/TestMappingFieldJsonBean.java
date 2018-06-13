@@ -1,34 +1,30 @@
 package oop.test.elasticsearch.entity;
 
 import oop.elasticsearch.annotation.EsDoc;
-import oop.elasticsearch.annotation.EsFields;
-import oop.elasticsearch.annotation.EsTransient;
+import oop.elasticsearch.annotation.EsFieldsJson;
 import oop.elasticsearch.base.EsBaseEntity;
 
 /**
  * @author 欧阳洁
- * @since 2018-05-08 18:57
+ * @since 2018-06-13 10:31
  */
-@EsDoc(Index = "test2",Type = "indexType2")
-public class TestMappingFieldsBean extends EsBaseEntity {
+@EsDoc(Index = "test3",Type = "indexType3")
+public class TestMappingFieldJsonBean extends EsBaseEntity {
     /**
      * id
      */
-    @EsFields(boost = 5.0)
+    @EsFieldsJson("{'type': 'keyword','store': true,'boost':5.0}")
     private String id;
     /**
      * name
      */
+    @EsFieldsJson("{'type': 'keyword','store': true}")
     private String name;
     /**
      * article
      */
+    @EsFieldsJson("{'type': 'text','store': true}")
     private String article;
-    /**
-     * article
-     */
-    @EsTransient
-    private String search;
 
     public String getId() {
         return id;
@@ -52,13 +48,5 @@ public class TestMappingFieldsBean extends EsBaseEntity {
 
     public void setArticle(String article) {
         this.article = article;
-    }
-
-    public String getSearch() {
-        return search;
-    }
-
-    public void setSearch(String search) {
-        this.search = search;
     }
 }

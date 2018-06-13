@@ -22,6 +22,10 @@ public class ElasticsearchConfig {
      */
     private static Properties properties = new Properties();
 
+    private static TransportClient client = null;
+
+
+
     /**
      * 启动程序的时候读取properties配置文件信息，并永久缓存
      */
@@ -69,7 +73,10 @@ public class ElasticsearchConfig {
      * @return
      */
     public static TransportClient getClient() {
-        return getClient(null,null,null);
+        if(null == client){
+            client = getClient(null,null,null);
+        }
+        return client;
     }
     /**
      * 获取client

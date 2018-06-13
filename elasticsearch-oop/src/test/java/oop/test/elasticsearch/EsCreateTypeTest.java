@@ -1,5 +1,6 @@
 package oop.test.elasticsearch;
 
+import oop.test.elasticsearch.service.TestMappingFieldJsonService;
 import oop.test.elasticsearch.service.TestMappingFieldsService;
 import oop.test.elasticsearch.service.TestMappingJsonFieldsService;
 import org.junit.Test;
@@ -23,6 +24,14 @@ public class EsCreateTypeTest {
     public void test2() {
         try {
             TestMappingJsonFieldsService service = new TestMappingJsonFieldsService();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+    @Test
+    public void test3() {
+        try {
+            TestMappingFieldJsonService service = new TestMappingFieldJsonService();
         }catch (Exception e){
             e.printStackTrace();
         }

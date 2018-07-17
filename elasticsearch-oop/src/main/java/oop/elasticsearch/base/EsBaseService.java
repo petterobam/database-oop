@@ -1,10 +1,8 @@
 package oop.elasticsearch.base;
 
+import oop.elasticsearch.annotation.EsParamSql;
 import oop.elasticsearch.config.ElasticsearchConfig;
-import oop.elasticsearch.utils.EsJsonUtils;
-import oop.elasticsearch.utils.EsLogUtils;
-import oop.elasticsearch.utils.EsMappingHelper;
-import oop.elasticsearch.utils.EsUtils;
+import oop.elasticsearch.utils.*;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
@@ -96,6 +94,10 @@ public class EsBaseService<T extends EsBaseEntity> {
      * id 属性
      */
     private Field idField;
+    /**
+     * 属性映射Map
+     */
+    private Map<String,Field> fieldMap;
 
     /**
      * 继承时候使用的构造函数
@@ -107,7 +109,8 @@ public class EsBaseService<T extends EsBaseEntity> {
         this.index = mappingHelper.getIndex();
         this.type = mappingHelper.getType();
         this.mapping = mappingHelper.getMappingStr();
-        idField = mappingHelper.getIdField();
+        this.idField = mappingHelper.getIdField();
+        this.fieldMap = mappingHelper.getFieldMap();
         this.createIndex(this.index, this.type, mapping);
     }
 
@@ -216,8 +219,8 @@ public class EsBaseService<T extends EsBaseEntity> {
     }
 
     /**
-     * @param index d
-     * @param type  d
+     * @param index 索引
+     * @param type 类型
      * @return d
      */
     public IndexRequestBuilder indexRequest(String index, String type) {
@@ -225,8 +228,8 @@ public class EsBaseService<T extends EsBaseEntity> {
     }
 
     /**
-     * @param index d
-     * @param type  d
+     * @param index 索引
+     * @param type 类型
      * @param id    d
      * @return d
      */
@@ -243,8 +246,8 @@ public class EsBaseService<T extends EsBaseEntity> {
     }
 
     /**
-     * @param index d
-     * @param type  d
+     * @param index 索引
+     * @param type 类型
      * @param id    d
      * @return d
      */
@@ -300,8 +303,8 @@ public class EsBaseService<T extends EsBaseEntity> {
     }
 
     /**
-     * @param index d
-     * @param type  d
+     * @param index 索引
+     * @param type 类型
      * @return d
      */
     public SearchRequestBuilder searchRequest(String index, String type) {
@@ -311,8 +314,8 @@ public class EsBaseService<T extends EsBaseEntity> {
     /**
      * mget多条件关联查询
      *
-     * @param extraIndex d
-     * @param extraType  d
+     * @param extraIndex 额外索引
+     * @param extraType 额外类型
      * @param id         关联id
      * @return d
      */
@@ -323,10 +326,10 @@ public class EsBaseService<T extends EsBaseEntity> {
     /**
      * mget多条件关联查询
      *
-     * @param index  d
-     * @param type   d
-     * @param index2 d
-     * @param type2  d
+     * @param index 索引
+     * @param type 类型
+     * @param index2 索引2
+     * @param type2 类型2
      * @param id     关联id
      * @return d
      */
@@ -412,7 +415,7 @@ public class EsBaseService<T extends EsBaseEntity> {
     }
 
     /**
-     * @param index  d
+     * @param index 索引
      * @param filter d
      * @return d
      */
@@ -591,6 +594,69 @@ public class EsBaseService<T extends EsBaseEntity> {
     }
 
     /**
+     * 执行 自定义 EsParamSql 注解里查询的语句
+     *
+     * @param params
+     * @return
+     */
+    public List<T> excuteParamSql(Object... params) {
+        //[0]为getStackTrace方法，[1]当前的excuteQuery方法，[2]为调用excuteQuery方法的方法
+        StackTraceElement parrentMethodInfo = Thread.currentThread().getStackTrace()[2];// [2]该结果不可能为空
+        EsParamSql paramSqlAnnotation = EsSqlUtils.getParamSqlAnnotation(parrentMethodInfo,params);
+        String messagePattern = paramSqlAnnotation.paramSql();
+        String searchParam = EsParseMsgUtils.parseMsg(messagePattern,params);
+        T entity = EsUtils.getInstance(this.targetClass);
+        entity.setSearchParam(searchParam);
+        return this.query(entity);
+    }
+    /**
+     * 执行 自定义 EsParamSql 注解里查询的语句
+     *
+     * @param entity
+     * @return
+     */
+    public List<T> excuteParamSql(T entity) {
+        //[0]为getStackTrace方法，[1]当前的excuteQuery方法，[2]为调用excuteQuery方法的方法
+        StackTraceElement parrentMethodInfo = Thread.currentThread().getStackTrace()[2];// [2]该结果不可能为空
+        EsParamSql paramSqlAnnotation = EsSqlUtils.getParamSqlAnnotation(parrentMethodInfo,this.targetClass);
+        String messagePattern = paramSqlAnnotation.paramSql();
+        String[] paramNames = paramSqlAnnotation.params();
+        String searchParam = null;
+        if(paramNames != null && paramNames.length > 0){
+            Object[] params = new Object[paramNames.length];
+            int i = 0;
+            for (String paramName : paramNames) {
+                Field field = this.fieldMap.get(paramName);
+                if(null != field) {
+                    params[i] = this.readField(field, entity);
+                }
+                i++;
+            }
+            searchParam = EsParseMsgUtils.parseMsg(messagePattern,params);
+        }else {
+            searchParam = messagePattern;
+        }
+
+        entity.setSearchParam(searchParam);
+        return this.query(entity);
+    }
+
+    /**
+     * 读取属性的值
+     *
+     * @param field
+     * @return
+     */
+    private Object readField(Field field, T target) {
+        try {
+            return EsUtils.readField(field, target, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
      * 通过ID查找到对象
      *
      * @param entity
@@ -606,8 +672,11 @@ public class EsBaseService<T extends EsBaseEntity> {
             // Get 参数查询方式
             EsLogUtils.info("Get 参数查询方式 参数为 {}", entity.getSearchParam());
             srb.setQuery(QueryBuilders.queryStringQuery(entity.getSearchParam()));
-        } else {
+        } else if(EsUtils.isNotEmpty(entity.getSearchBody())) {
             // 将 searchBody 转化为 QueryBuilder 对象
+        } else {
+            // 将entity生成最简单的 searchParam
+
         }
         List<T> result = new ArrayList<T>();
         try {

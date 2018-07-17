@@ -14,6 +14,8 @@ import org.elasticsearch.common.xcontent.XContentFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,6 +45,10 @@ public class EsMappingHelper {
      * id 属性
      */
     private Field idField;
+    /**
+     * 属性集合
+     */
+    private Map<String,Field> fieldMap;
 
     /**
      * 构造函数
@@ -52,6 +58,8 @@ public class EsMappingHelper {
     public EsMappingHelper(Class<?> targetClass) {
         this.targetClass = targetClass;
         readIndexAndType();
+        // 初始化时候加载，不涉及多线程风险
+        this.fieldMap = new HashMap<String, Field>();
         this.mappingStr = getMappingStr();
     }
 
@@ -81,6 +89,16 @@ public class EsMappingHelper {
             String pathForClasspath = mappingFile.value();
             InputStream inputStream = EsMappingHelper.class.getClassLoader().getResourceAsStream(pathForClasspath);
             mappingStr = EsUtils.convertStreamToStr(inputStream);
+            Field[] fieldArray = this.targetClass.getDeclaredFields();
+            if (null == fieldArray || fieldArray.length == 0) {
+                return mappingStr;
+            }
+            for (Field field : fieldArray) {
+                if (null == idField && field.getAnnotation(EsId.class) != null) {
+                    this.idField = field;
+                }
+                this.fieldMap.put(field.getName(), field);
+            }
         } else {
             Field[] fieldArray = this.targetClass.getDeclaredFields();
             if (null == fieldArray || fieldArray.length == 0) {
@@ -90,14 +108,15 @@ public class EsMappingHelper {
                 XContentBuilder mapping = XContentFactory.jsonBuilder().startObject().startObject(this.type);
                 mapping.startObject("properties");
                 for (Field field : fieldArray) {
-                    if(null == idField && field.getAnnotation(EsId.class) != null){
+                    if(null == idField && field.getAnnotation(EsId.class) != null) {
                         this.idField = field;
                     }
+                    this.fieldMap.put(field.getName(), field);
                     mapping.startObject(field.getName());
                     EsTransient esTransient = field.getAnnotation(EsTransient.class);
                     if (null != esTransient) {
-                        // EsTransient注解标记的属性即不存储也不做索引建立，无关字段
-                        mapping.field("type","text")/*.field("enabled", false)*/.field("doc_values", false).field("store", false);
+                        // EsTransient 注解标记的属性即不存储也不做索引建立，无关字段
+                        mapping.field("type","text").field("doc_values", false).field("store", false);
                     } else {
                         EsFieldsJson esfieldsJson = field.getAnnotation(EsFieldsJson.class);
                         EsFields esfields = field.getAnnotation(EsFields.class);
@@ -309,5 +328,9 @@ public class EsMappingHelper {
 
     public void setIdField(Field idField) {
         this.idField = idField;
+    }
+
+    public Map<String, Field> getFieldMap() {
+        return fieldMap;
     }
 }

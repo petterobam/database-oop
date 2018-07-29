@@ -18,18 +18,16 @@
 
 1. arangodb
 1. db2
-1. <span style="color:green;">elasticsearch</span>
-1. <span style="color:red;">mongodb</span>
+1. elasticsearch[完成初步]
+1. mongodb[**进行中**]
 1. mysql
-1. <span style="color:red;">oracle</span>
+1. oracle[**进行中**]
 1. postgresql
-1. <span style="color:red;">redis</span>
-1. <span style="color:green;">sqlite</span>
+1. redis[**进行中**]
+1. sqlite[完成初步]
 1. sqlserver
-1. <span style="color:red;">xml</span>
-1. <span style="color:green;">access</span>
-
-PS：<span style="color:green;">绿色</span>代表已经完成初步[-ed-ing]；<span style="color:red;">红色</span>代表进行中[-ing]。
+1. xml[**进行中**]
+1. access[完成初步]
 
 ## 封装要求
 

@@ -10,6 +10,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -389,7 +391,64 @@ public class SqliteUtils {
      * @return
      */
     public static long getNowStamp(){
-        return new Date().getTime();
+        // return new Date().getTime();
+        return System.currentTimeMillis();
+    }
+
+    /**
+     * 通过反射, 获得Class定义中声明的父类的第一个泛型参数的类型.
+     * 如无法找到, 返回Object.class.
+     * eg.
+     * public UserDao extends SqliteBaseDao<User>
+     *
+     * @param clazz The class to introspect
+     *
+     * @return the first generic declaration, or Object.class if cannot be determined
+     */
+    public static <T> Class<T> getFirstSuperClassGenricType(final Class clazz) {
+        return getSuperClassGenricType(clazz, 0);
+    }
+    /**
+     * 通过反射, 获得Class定义中声明的父类的第二个泛型参数的类型.
+     * 如无法找到, 返回Object.class.
+     * eg.
+     * public UserDao extends SqliteBaseDao<User>
+     *
+     * @param clazz The class to introspect
+     *
+     * @return the first generic declaration, or Object.class if cannot be determined
+     */
+    public static <T> Class<T> getSecondSuperClassGenricType(final Class clazz) {
+        return getSuperClassGenricType(clazz, 1);
+    }
+
+    /**
+     * 通过反射, 获得Class定义中声明的父类的泛型参数的类型.
+     * 如无法找到, 返回Object.class.
+     *
+     * 如 public UserDao extends SqliteBaseDao<User>
+     *
+     * @param clazz clazz The class to introspect
+     * @param index the Index of the generic ddeclaration,start from 0.
+     *
+     * @return the index generic declaration, or Object.class if cannot be determined
+     */
+    public static Class getSuperClassGenricType(final Class clazz, final int index) {
+        Type genType = clazz.getGenericSuperclass();
+
+        if (!(genType instanceof ParameterizedType)) {
+            return Object.class;
+        }
+
+        Type[] params = ((ParameterizedType) genType).getActualTypeArguments();
+
+        if (index >= params.length || index < 0) {
+            return Object.class;
+        }
+        if (!(params[index] instanceof Class)) {
+            return Object.class;
+        }
+        return (Class) params[index];
     }
 }
 

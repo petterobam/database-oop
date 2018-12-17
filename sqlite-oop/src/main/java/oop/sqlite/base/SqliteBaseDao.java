@@ -22,11 +22,11 @@ public abstract class SqliteBaseDao<T extends SqliteBaseEntity> {
     private SqliteSqlHelper sqlHelper;
     private SqliteHelper sqliteHelper;
 
-    public SqliteBaseDao(Class<T> entityClass) {
-        this.entityClazz = entityClass;
-        this.sqlHelper = new SqliteSqlHelper(entityClass);
+    public SqliteBaseDao() {
+        this.entityClazz = SqliteUtils.getFirstSuperClassGenricType(getClass());
+        this.sqlHelper = new SqliteSqlHelper(this.entityClazz);
         this.tableName = this.sqlHelper.getTableName();
-        this.sqliteHelper = new SqliteHelper(entityClass);
+        this.sqliteHelper = new SqliteHelper(this.entityClazz);
         //调用该方法就能在使用时检查和创建表，可以通过配置信息判断是否执调用，达到开关控制的效果
         this.existOrCreateTable();
     }

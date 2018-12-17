@@ -13,7 +13,8 @@ import java.util.List;
 public abstract class SqliteBaseService<T extends SqliteBaseEntity, D extends SqliteBaseDao<T>> {
     private D baseDao;
 
-    public SqliteBaseService(Class<D> daoClass) {
+    public SqliteBaseService() {
+        Class<D> daoClass = SqliteUtils.getSecondSuperClassGenricType(getClass());
         this.baseDao = SqliteUtils.getInstance(daoClass);
     }
 

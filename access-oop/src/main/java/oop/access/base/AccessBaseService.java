@@ -13,7 +13,8 @@ import java.util.List;
 public abstract class AccessBaseService<T extends AccessBaseEntity, D extends AccessBaseDao<T>> {
     private D baseDao;
 
-    public AccessBaseService(Class<D> daoClass) {
+    public AccessBaseService() {
+        Class<D> daoClass = AccessUtils.getSecondSuperClassGenricType(getClass());
         this.baseDao = AccessUtils.getInstance(daoClass);
     }
 

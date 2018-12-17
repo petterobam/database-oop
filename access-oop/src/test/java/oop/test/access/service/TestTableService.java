@@ -13,9 +13,6 @@ import java.util.List;
  * @create 2017-09-30 15:16
  **/
 public class TestTableService extends AccessBaseService<TestTable, TestTableDao> {
-    public TestTableService() {// 必须要对应实现父类的构造方法
-        super(TestTableDao.class);// 对应的Dao类
-    }
 
     public List<TestTable> getByName(String name) {
         TestTable entity = new TestTable();

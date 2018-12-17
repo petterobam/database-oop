@@ -22,11 +22,11 @@ public abstract class AccessBaseDao<T extends AccessBaseEntity> {
     private AccessSqlHelper sqlHelper;
     private AccessHelper accessHelper;
 
-    public AccessBaseDao(Class<T> entityClass) {
-        this.entityClazz = entityClass;
-        this.sqlHelper = new AccessSqlHelper(entityClass);
+    public AccessBaseDao() {
+        this.entityClazz = AccessUtils.getFirstSuperClassGenricType(getClass());
+        this.sqlHelper = new AccessSqlHelper(this.entityClazz);
         this.tableName = this.sqlHelper.getTableName();
-        this.accessHelper = new AccessHelper(entityClass);
+        this.accessHelper = new AccessHelper(this.entityClazz);
         //调用该方法就能在使用时检查和创建表，可以通过配置信息判断是否执调用，达到开关控制的效果
         this.existOrCreateTable();
     }

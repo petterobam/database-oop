@@ -13,9 +13,6 @@ import java.util.List;
  * @create 2017-09-30 15:16
  **/
 public class TestAccessSplitService extends AccessBaseService<TestAccessSplit, TestAccessSplitDao> {
-    public TestAccessSplitService() {// 必须要对应实现父类的构造方法
-        super(TestAccessSplitDao.class);// 对应的Dao类
-    }
 
     public List<TestAccessSplit> getByName(String name) {
         TestAccessSplit entity = new TestAccessSplit();

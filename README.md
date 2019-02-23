@@ -6,7 +6,7 @@
 [![Waffle.io - Columns and their card count](https://badge.waffle.io/petterobam/database-oop.png?columns=all)](https://waffle.io/petterobam/database-oop?utm_source=badge)
 
 # 结构化数据存储系统的面向对象封装
-博客地址：[http://www.db2oop.cn](http://www.db2oop.cn)
+博客地址：[http://db2oop.petterobam.cn](http://db2oop.petterobam.cn)
 
 自动构建：[https://travis-ci.org/petterobam/database-oop](https://travis-ci.org/petterobam/database-oop)
 

@@ -79,8 +79,13 @@ layout: blog
     </div>
 </article>
 <div class="misc-content">
+    <!-- gitment -->
     {% if site.gitment.owner and site.gitment.repo and site.gitment.oauth_client_id and site.gitment.oauth_client_secret %}
     {% include common/gitment.html %}
+    {% endif %}
+    <!-- utterances -->
+    {% if site.utterances.enable %}
+    {% include common/utterances.html %}
     {% endif %}
 </div>
 {% if site.directory %}

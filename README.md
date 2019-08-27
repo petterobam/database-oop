@@ -3,7 +3,6 @@
 [![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=103)](https://opensource.org/licenses/mit-license.php)
 [![Analytics](https://ga-beacon.appspot.com/UA-85522412-2/welcome-page)](https://github.com/igrigorik/ga-beacon)
 [![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges)
-[![Waffle.io - Columns and their card count](https://badge.waffle.io/petterobam/database-oop.png?columns=all)](https://waffle.io/petterobam/database-oop?utm_source=badge)
 
 # 结构化数据存储系统的面向对象封装
 博客地址：[http://db2oop.petterobam.cn](http://db2oop.petterobam.cn)

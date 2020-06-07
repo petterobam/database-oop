@@ -13,9 +13,6 @@ import java.util.List;
  * @create 2017-09-30 15:16
  **/
 public class TestSqliteSplitService extends SqliteBaseService<TestSqliteSplit, TestSqliteSplitDao> {
-    public TestSqliteSplitService() {// 必须要对应实现父类的构造方法
-        super(TestSqliteSplitDao.class);// 对应的Dao类
-    }
 
     public List<TestSqliteSplit> getByName(String name) {
         TestSqliteSplit entity = new TestSqliteSplit();

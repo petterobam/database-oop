@@ -4,6 +4,7 @@ import oop.sqlite.annotation.SqliteColumn;
 import oop.sqlite.annotation.SqliteID;
 import oop.sqlite.annotation.SqliteTable;
 import oop.sqlite.annotation.SqliteTransient;
+import oop.sqlite.annotation.ext.SqliteWhereLike;
 import oop.sqlite.base.SqliteBaseEntity;
 
 /**
@@ -22,6 +23,7 @@ public class TestTable extends SqliteBaseEntity {
     /**
      * 名称
      */
+    @SqliteWhereLike
     @SqliteColumn(type = "char(100)", notNull = true)
     private String name;
     /**

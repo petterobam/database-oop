@@ -13,7 +13,7 @@ public class EsFieldType {
     布尔型: boolean
     日期: date
     */
-    public static final String STRING = "string";
+    //public static final String STRING = "string";
     public static final String TEXT = "text";
     public static final String KEYWORD = "keyword";
     public static final String BYTE = "byte";

@@ -13,12 +13,6 @@ import java.util.List;
  * @create 2017-09-29 17:17
  **/
 public class TestSqliteSplitDao extends SqliteBaseDao<TestSqliteSplit> {
-    /**
-     * 构造函数
-     */
-    public TestSqliteSplitDao() {// 必须要对应实现父类的构造方法
-        super(TestSqliteSplit.class);// 表实体对应类
-    }
 
     /**
      * 根据名称模糊查找数据

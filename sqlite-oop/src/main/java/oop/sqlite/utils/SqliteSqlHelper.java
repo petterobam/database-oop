@@ -6,6 +6,7 @@ import oop.sqlite.annotation.SqliteSql;
 import oop.sqlite.annotation.SqliteTable;
 import oop.sqlite.annotation.SqliteTableSplit;
 import oop.sqlite.annotation.SqliteTransient;
+import oop.sqlite.annotation.ext.SqliteWhereLike;
 import oop.sqlite.base.SqliteBaseEntity;
 
 import java.lang.reflect.Field;
@@ -14,6 +15,7 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Vector;
 
 /**
@@ -516,7 +518,22 @@ public class SqliteSqlHelper<T extends SqliteBaseEntity> {
                         if (null != sqliteColumn) {
                             columnName = SqliteUtils.isBlank(sqliteColumn.name()) ? field.getName() : sqliteColumn.name();
                         }
-                        sqlBuffer.append(" and ").append(columnName.toLowerCase()).append("=?");
+
+                        // 处理默认SQL生成为 LIKE 语句
+                        SqliteWhereLike like = field.getAnnotation(SqliteWhereLike.class);
+                        if (null == like) {
+                            sqlBuffer.append(" and ").append(columnName.toLowerCase()).append("=?");
+                        } else {
+                            sqlBuffer.append(" and ").append(columnName.toLowerCase()).append(" like ?");
+                            if (like.onlyLeft()) {
+                                currentValue = "%" + currentValue;
+                            } else if (like.onlyRight()) {
+                                currentValue = currentValue + "%";
+                            } else {
+                                currentValue = "%" + currentValue + "%";
+                            }
+                        }
+
                         param.add(currentValue);
                     }
                 }

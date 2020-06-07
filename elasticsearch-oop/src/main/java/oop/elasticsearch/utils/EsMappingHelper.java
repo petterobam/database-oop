@@ -1,8 +1,11 @@
 package oop.elasticsearch.utils;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import oop.elasticsearch.annotation.EsDoc;
 import oop.elasticsearch.annotation.EsFields;
 import oop.elasticsearch.annotation.EsFieldsJson;
+import oop.elasticsearch.annotation.EsId;
 import oop.elasticsearch.annotation.EsMappingFile;
 import oop.elasticsearch.annotation.EsTransient;
 import org.elasticsearch.common.xcontent.XContentBuilder;
@@ -11,6 +14,9 @@ import org.elasticsearch.common.xcontent.XContentFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * es索引mapping工具类
@@ -35,26 +41,14 @@ public class EsMappingHelper {
      * mapping 字符串
      */
     private String mappingStr;
-
-    public void setMappingStr(String mappingStr) {
-        this.mappingStr = mappingStr;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getIndex() {
-        return index;
-    }
-
-    public void setIndex(String index) {
-        this.index = index;
-    }
+    /**
+     * id 属性
+     */
+    private Field idField;
+    /**
+     * 属性集合
+     */
+    private Map<String,Field> fieldMap;
 
     /**
      * 构造函数
@@ -64,6 +58,8 @@ public class EsMappingHelper {
     public EsMappingHelper(Class<?> targetClass) {
         this.targetClass = targetClass;
         readIndexAndType();
+        // 初始化时候加载，不涉及多线程风险
+        this.fieldMap = new HashMap<String, Field>();
         this.mappingStr = getMappingStr();
     }
 
@@ -84,12 +80,25 @@ public class EsMappingHelper {
      * @return
      */
     public String getMappingStr() {
+        if(EsUtils.isNotEmpty(this.mappingStr)){
+            return this.mappingStr;
+        }
         String mappingStr = null;
         EsMappingFile mappingFile = targetClass.getAnnotation(EsMappingFile.class);
         if (null != mappingFile) {
             String pathForClasspath = mappingFile.value();
             InputStream inputStream = EsMappingHelper.class.getClassLoader().getResourceAsStream(pathForClasspath);
             mappingStr = EsUtils.convertStreamToStr(inputStream);
+            Field[] fieldArray = this.targetClass.getDeclaredFields();
+            if (null == fieldArray || fieldArray.length == 0) {
+                return mappingStr;
+            }
+            for (Field field : fieldArray) {
+                if (null == idField && field.getAnnotation(EsId.class) != null) {
+                    this.idField = field;
+                }
+                this.fieldMap.put(field.getName(), field);
+            }
         } else {
             Field[] fieldArray = this.targetClass.getDeclaredFields();
             if (null == fieldArray || fieldArray.length == 0) {
@@ -99,18 +108,22 @@ public class EsMappingHelper {
                 XContentBuilder mapping = XContentFactory.jsonBuilder().startObject().startObject(this.type);
                 mapping.startObject("properties");
                 for (Field field : fieldArray) {
+                    if(null == idField && field.getAnnotation(EsId.class) != null) {
+                        this.idField = field;
+                    }
+                    this.fieldMap.put(field.getName(), field);
                     mapping.startObject(field.getName());
                     EsTransient esTransient = field.getAnnotation(EsTransient.class);
                     if (null != esTransient) {
-                        // EsTransient注解标记的属性即不存储也不做索引建立，无关字段
-                        mapping.field("enabled", false).field("doc_values", false).field("store", false);
+                        // EsTransient 注解标记的属性即不存储也不做索引建立，无关字段
+                        mapping.field("type","text").field("doc_values", false).field("store", false);
                     } else {
                         EsFieldsJson esfieldsJson = field.getAnnotation(EsFieldsJson.class);
                         EsFields esfields = field.getAnnotation(EsFields.class);
                         if (null != esfieldsJson) {
-                            putFileds(mapping,esfieldsJson);
+                            putFileds(mapping, esfieldsJson);
                         } else if (null != esfields) {
-                            putFileds(mapping,esfields);
+                            putFileds(mapping, esfields);
                         } else {
                             mapping.field("type", "keyword").field("store", true);
                         }
@@ -124,20 +137,29 @@ public class EsMappingHelper {
                 return mappingStr;
             }
         }
+        EsLogUtils.info("生成的Mapping为 {}", mappingStr);
         return mappingStr;
     }
 
     /**
      * 填充 EsFieldsJson 注解里面所有的Fields到对应属性里面
+     *
      * @param mapping
      * @param esFieldsJson
      * @throws IOException
      */
     private void putFileds(XContentBuilder mapping, EsFieldsJson esFieldsJson) throws IOException {
-
+        JSONObject fields = JSON.parseObject(esFieldsJson.value());
+        if (!fields.isEmpty()) {
+            for (Map.Entry<String, Object> field : fields.entrySet()) {
+                mapping.field(field.getKey(), field.getValue());
+            }
+        }
     }
+
     /**
      * 填充 EsFields 注解里面所有的Fields到对应属性里面
+     *
      * @param mapping
      * @param esfields
      * @throws IOException
@@ -278,5 +300,37 @@ public class EsMappingHelper {
         if (!EsUtils.isBlank(esfields.term_vector())) {
             mapping.field("term_vector", esfields.term_vector());
         }
+    }
+
+    public void setMappingStr(String mappingStr) {
+        this.mappingStr = mappingStr;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getIndex() {
+        return index;
+    }
+
+    public void setIndex(String index) {
+        this.index = index;
+    }
+
+    public Field getIdField() {
+        return idField;
+    }
+
+    public void setIdField(Field idField) {
+        this.idField = idField;
+    }
+
+    public Map<String, Field> getFieldMap() {
+        return fieldMap;
     }
 }

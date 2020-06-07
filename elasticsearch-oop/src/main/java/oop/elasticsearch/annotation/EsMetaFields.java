@@ -15,7 +15,7 @@ public @interface EsMetaFields {
      * 元字段名
      * @return
      */
-    String name() default EsFieldType.STRING;
+    String name();
 
     /**
      * 分析器类型

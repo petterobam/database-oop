@@ -70,12 +70,6 @@ public class TestTable extends SqliteBaseEntity {
  * @create 2017-09-29 17:17
  */
 public class TestTableDao extends SqliteBaseDao<TestTable> {
-    /**
-     * 构造函数
-     */
-    public TestTableDao() {// 必须要对应实现父类的构造方法
-        super(TestTable.class);// 表实体对应类
-    }
 
     /**
      * 根据名称模糊查找数据
@@ -112,9 +106,6 @@ public class TestTableDao extends SqliteBaseDao<TestTable> {
  */
 @Service
 public class TestTableService extends SqliteBaseService<TestTable, TestTableDao> {
-    public TestTableService() {// 必须要对应实现父类的构造方法
-        super(TestTableDao.class);// 对应的Dao类
-    }
     public List<TestTable> getByName(String name) {
         TestTable entity = new TestTable();
         entity.setName(name);

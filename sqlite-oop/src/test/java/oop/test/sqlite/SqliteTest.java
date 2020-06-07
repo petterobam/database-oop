@@ -108,12 +108,20 @@ public class SqliteTest {
         entity.setCreateTime(SqliteUtils.getStringDate());
         sqliteService.insert(entity);
 
+        // SELECT * FROM t_test_table WHERE 1=1
         TestTable queryEntity = new TestTable();
         sqliteService.query(queryEntity);
+        // like 语句查询： SELECT * FROM t_test_table WHERE 1=1  and name like '%t%'
+        queryEntity.setName("t");
+        sqliteService.query(queryEntity);
+        // SELECT * FROM t_test_table WHERE 1=1 and author=?
+        queryEntity.setName(null);
         queryEntity.setAuthor("petter");
         sqliteService.query(queryEntity);
+        // SELECT * FROM t_test_table WHERE 1=1  and name like ? and author=?
         queryEntity.setName("test");
         sqliteService.query(queryEntity);
+        // SELECT * FROM t_test_table WHERE 1=1  and id=?
         queryEntity.setId(1);
         sqliteService.query(queryEntity);
     }

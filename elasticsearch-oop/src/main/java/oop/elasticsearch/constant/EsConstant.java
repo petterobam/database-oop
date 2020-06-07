@@ -18,5 +18,5 @@ public class EsConstant {
     /**
      * 默认字段属性集JSON字符串
      */
-    public static final String FIELDS_JSON_DEFAULT = "{'type':'string'}";
+    public static final String FIELDS_JSON_DEFAULT = "{'type':'keyword'}";
 }

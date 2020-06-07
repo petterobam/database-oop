@@ -50,3 +50,5 @@ fabric.properties
 # docs
 /docs/_site/
 /docs/.sass-cache/
+/docs/vendor/**
+/docs/.bundle/*

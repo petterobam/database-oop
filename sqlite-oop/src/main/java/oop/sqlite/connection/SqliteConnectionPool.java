@@ -16,20 +16,26 @@ import java.util.concurrent.TimeUnit;
  * @since 2018-05-02 13:41
  */
 public class SqliteConnectionPool extends SqliteBaseConnectionFactory {
-    private static int SLEEP = SqliteConfig.getPoolThreadSleep();// 线程每次SLEEP时长
-    private static boolean CHECK_RUN_ACTIVE = false;// 检查 ClearRunConnectionThread 线程是否在
-    private static boolean CHECK_IDLE_ACTIVE = false;// 检查 RefreshIdleConnectionThread 线程是否在
-    private static boolean CHECK_MONITOR_ACTIVE = false;// 检查 MonitorConnectionPoolThread 线程是否在
-    private static int COUNT_RUN_ACTIVE = 0;// 检查 ClearRunConnectionThread 线程活跃数量
-    private static int COUNT_IDLE_ACTIVE = 0;// 检查 RefreshIdleConnectionThread 线程活跃数量
-    private static int COUNT_MONITOR_ACTIVE = 0;// 检查 MonitorConnectionPoolThread 线程活跃数量
+    // 线程每次SLEEP时长
+    private static volatile boolean CHECK_RUN_ACTIVE = false;
+    // 检查 ClearRunConnectionThread 线程是否在
+    private static int SLEEP = SqliteConfig.getPoolThreadSleep();
+    // 检查 RefreshIdleConnectionThread 线程是否在
+    private static volatile boolean CHECK_IDLE_ACTIVE = false;
+    // 检查 MonitorConnectionPoolThread 线程是否在
+    private static volatile boolean CHECK_MONITOR_ACTIVE = false;
+    // 检查 ClearRunConnectionThread 线程活跃数量
+    private static volatile int COUNT_RUN_ACTIVE = 0;
+    // 检查 RefreshIdleConnectionThread 线程活跃数量
+    private static volatile int COUNT_IDLE_ACTIVE = 0;
+    // 检查 MonitorConnectionPoolThread 线程活跃数量
+    private static volatile int COUNT_MONITOR_ACTIVE = 0;
 
     /**
      * LINK 线程池
      */
     private static final ExecutorService CONNECTION_POOL_EXETHREAD = new ThreadPoolExecutor(3, 10,
-            0L, TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<Runnable>(2000),
+            0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(2000),
             SqliteThreadUtils.buildJobFactory("Sqlite 连接池 监控系统 线程池"), new ThreadPoolExecutor.AbortPolicy());
 
     /**

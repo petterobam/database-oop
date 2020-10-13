@@ -16,7 +16,7 @@
         <jackcess.version>2.1.11</jackcess.version>
         <ucanaccess.version>4.0.4</ucanaccess.version>
         <fastjson.version>1.2.70</fastjson.version>
-        <junit.version>4.11</junit.version>
+        <junit.version>4.13.1</junit.version>
 
         <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -12,8 +12,6 @@
     <artifactId>postgresql-oop</artifactId>
 
     <properties>
-        <junit.version>4.11</junit.version>
-
         <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <surefire-plugin.version>2.19.1</surefire-plugin.version>

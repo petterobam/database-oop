@@ -23,6 +23,10 @@
         <module>postgresql-oop</module>
     </modules>
 
+    <properties>
+        <junit.version>4.13.1</junit.version>
+    </properties>
+
     <build>
         <plugins>
             <plugin>

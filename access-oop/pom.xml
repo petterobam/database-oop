@@ -15,7 +15,7 @@
         <jackcess-encrypt.version>2.1.4</jackcess-encrypt.version>
         <jackcess.version>2.1.11</jackcess.version>
         <ucanaccess.version>4.0.4</ucanaccess.version>
-        <fastjson.version>1.2.70</fastjson.version>
+        <fastjson.version>1.2.83</fastjson.version>
         <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <surefire-plugin.version>2.19.1</surefire-plugin.version>
